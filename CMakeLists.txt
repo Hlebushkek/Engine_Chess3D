@@ -18,13 +18,13 @@ include_directories(
 
 file(GLOB SOURCES "source/*.cpp" "include/*.hpp")
 
-add_executable(${PROJECT_NAME} ${SOURCES})
-
-target_link_libraries(${PROJECT_NAME}
-    -LC:/Users/hlebushkek/Documents/Chess3D/build/GameEngine/
-    -LC:/Users/hlebushkek/Documents/Chess3D/build/GameEngine/vendors/SDL/
-    -LC:/Users/hlebushkek/Documents/Chess3D/build/GameEngine/vendors/SDL_image/
+link_directories(
+    ${PROJECT_SOURCE_DIR}/build/GameEngine/
+    ${PROJECT_SOURCE_DIR}/build/GameEngine/vendors/SDL/
+    ${PROJECT_SOURCE_DIR}/build/GameEngine/vendors/SDL_image/
 )
+
+add_executable(${PROJECT_NAME} ${SOURCES})
 
 target_link_libraries(${PROJECT_NAME} imgui)
 target_link_libraries(${PROJECT_NAME} SDL3 SDL3_image)
