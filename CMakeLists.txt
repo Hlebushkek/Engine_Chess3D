@@ -5,8 +5,13 @@ project(Chess3D)
 enable_language(C)
 enable_language(CXX)
 
+set(CMAKE_C_STANDARD 17)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_FLAGS_DEBUG_INIT "-Wall")
+
+if(APPLE)
+    enable_language(OBJC)
+endif()
 
 add_subdirectory(GameEngine)
 include_directories(
@@ -30,11 +35,16 @@ add_executable(${PROJECT_NAME} ${SOURCES})
 
 target_link_libraries(${PROJECT_NAME} imgui)
 target_link_libraries(${PROJECT_NAME} SDL3 SDL3_image)
-target_link_libraries(${PROJECT_NAME} libEngine)
+target_link_libraries(${PROJECT_NAME} Engine)
 
-add_custom_command(
-    TARGET ${PROJECT_NAME} POST_BUILD
+if(APPLE)
+    set(LIB_EXT dylib)
+else()
+    set(LIB_EXT dll)
+endif()
+
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy
-            ${CMAKE_CURRENT_BINARY_DIR}/GameEngine/libEngine.dll
-            ${CMAKE_CURRENT_BINARY_DIR}/libEngine.dll
+    ${CMAKE_BINARY_DIR}/GameEngine/libEngine.${LIB_EXT}
+    ${CMAKE_BINARY_DIR}/
 )
