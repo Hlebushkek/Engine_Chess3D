@@ -1,10 +1,10 @@
 #include <Engine.hpp>
 #include <include/EntryPoint.hpp>
-#include "../include/Chess3D.hpp"
-#include "../include/InterfaceLayer.hpp"
-#include "../include/ChessBoardLayer.hpp"
-#include "../include/Block.hpp"
-#include "../include/TestGameObject.hpp"
+#include "Chess3D.hpp"
+#include "InterfaceLayer.hpp"
+#include "ChessBoardLayer.hpp"
+#include "Block.hpp"
+#include "TestGameObject.hpp"
 
 Chess3D::Chess3D(const char* title, const int width, const int height)
     : Engine::Application(title, width, height)

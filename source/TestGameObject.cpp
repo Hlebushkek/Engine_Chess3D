@@ -1,4 +1,4 @@
-#include "../include/TestGameObject.hpp"
+#include "TestGameObject.hpp"
 
 TestGameObject::TestGameObject(glm::vec3 position, Engine::Texture* texture) : GameObject(position, glm::vec3(0.f), glm::vec3(0.1f))
 {

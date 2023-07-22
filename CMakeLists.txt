@@ -1,14 +1,16 @@
 cmake_minimum_required(VERSION 3.24)
 
-project(Chaess3D)
+project(Chess3D)
 
 enable_language(C)
 enable_language(CXX)
 
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_FLAGS_DEBUG_INIT "-Wall")
 
 add_subdirectory(GameEngine)
 include_directories(
+    include/
     GameEngine
     GameEngine/vendors/SDL/include/
     GameEngine/vendors/SDL_image/include/

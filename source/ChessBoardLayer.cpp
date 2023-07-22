@@ -1,5 +1,5 @@
-#include "../include/ChessBoardLayer.hpp"
-#include "../include/Chess3D.hpp"
+#include "ChessBoardLayer.hpp"
+#include "Chess3D.hpp"
 
 ChessBoardLayer::ChessBoardLayer() : Layer("ChessBoardLayer") {}
 

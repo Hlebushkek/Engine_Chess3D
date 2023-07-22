@@ -1,4 +1,4 @@
-#include "../include/Block.hpp"
+#include "Block.hpp"
 
 Block::Block(uint32_t id, const char* textureFileName, glm::vec3 position) : GameObject(position, glm::vec3(0.f), glm::vec3(0.0625f))
 {
