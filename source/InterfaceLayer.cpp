@@ -3,6 +3,7 @@
 #include <backends/imgui_impl_opengl3.h>
 #include "InterfaceLayer.hpp"
 #include "Chess3D.hpp"
+#include "Engine.hpp"
 
 InterfaceLayer::InterfaceLayer() : Layer("InterfaceLayer") {}
 
@@ -21,9 +22,9 @@ void InterfaceLayer::Update()
     
 }
 
-void InterfaceLayer::OnImGuiRender() 
+void InterfaceLayer::OnImGuiRender()
 {
-    ImGui::SetCurrentContext(Chess3D::Get()->imguiContext);
+    ImGui::SetCurrentContext(Engine::ImGuiLayer::GetImguiContext());
     ImGui::Begin("Settings");
 
     static int counter = 0;
