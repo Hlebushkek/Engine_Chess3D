@@ -33,8 +33,6 @@ link_directories(
 
 add_executable(${PROJECT_NAME} ${SOURCES})
 
-target_link_libraries(${PROJECT_NAME} imgui)
-target_link_libraries(${PROJECT_NAME} SDL3 SDL3_image)
 target_link_libraries(${PROJECT_NAME} Engine)
 
 if(APPLE)
