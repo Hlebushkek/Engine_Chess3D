@@ -7,21 +7,6 @@
 
 InterfaceLayer::InterfaceLayer() : Layer("InterfaceLayer") {}
 
-void InterfaceLayer::OnAttach()
-{
-    
-}
-
-void InterfaceLayer::OnDetach()
-{
-
-}
-
-void InterfaceLayer::Update()
-{
-    
-}
-
 void InterfaceLayer::OnImGuiRender()
 {
     ImGui::SetCurrentContext(Engine::ImGuiLayer::GetImguiContext());
