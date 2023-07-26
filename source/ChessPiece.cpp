@@ -4,7 +4,7 @@ ChessPiece::ChessPiece(Piece *pieceModel, glm::vec3 position)
     : GameObject(position, glm::vec3(0.f), glm::vec3(0.0625f))
 {
     this->meshes.emplace_back(pieceModel->getMesh());
-    this->texture = new Engine::Texture("Brick.png", GL_TEXTURE_2D);
+    this->texture = Engine::Texture::LoadTexture("Brick.png", GL_TEXTURE_2D);
 }
 
 ChessPiece::~ChessPiece()

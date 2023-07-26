@@ -16,7 +16,7 @@ Chess3D::Chess3D(const char* title, const int width, const int height)
     ChessBoard *board = new ChessBoard();
     boardLayer->AddRenderableObject(board);
     
-    TestGameObject* testObject = new TestGameObject(glm::vec3(0), new Engine::Texture("Grass.png", GL_TEXTURE_2D));
+    TestGameObject* testObject = new TestGameObject(glm::vec3(0), Engine::Texture::LoadTexture("Grass.png", GL_TEXTURE_2D));
     boardLayer->AddRenderableObject(testObject);
     
     InterfaceLayer* interfaceLayer = new InterfaceLayer();

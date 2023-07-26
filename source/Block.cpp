@@ -3,7 +3,7 @@
 Block::Block(uint32_t id, const char* textureFileName, glm::vec3 position) : GameObject(position, glm::vec3(0.f), glm::vec3(0.0625f))
 {
     this->id = id;
-    this->texture = new Engine::Texture(textureFileName, GL_TEXTURE_2D);
+    this->texture = Engine::Texture::LoadTexture(textureFileName, GL_TEXTURE_2D);
 
     CreateMesh(position);
 

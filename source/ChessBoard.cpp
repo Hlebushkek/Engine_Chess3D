@@ -5,8 +5,8 @@
 
 ChessBoard::ChessBoard()
 {
-    textureWhite = new Engine::Texture("BlockB.png", GL_TEXTURE_2D);
-    textureBlack = new Engine::Texture("Grass.png", GL_TEXTURE_2D);
+    textureWhite = Engine::Texture::LoadTexture("BlockB.png", GL_TEXTURE_2D);
+    textureBlack = Engine::Texture::LoadTexture("Grass.png", GL_TEXTURE_2D);
 
     for (int i = 0; i < 8; i++)
         for (int j = 0; j < 8; j++)
