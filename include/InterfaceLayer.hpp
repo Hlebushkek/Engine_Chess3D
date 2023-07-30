@@ -10,5 +10,5 @@ public:
 	virtual void OnImGuiRender() override;
 
 private:
-
+	Engine::Button myButton;
 };
