@@ -5,7 +5,12 @@
 #include "Chess3D.hpp"
 #include "Engine.hpp"
 
-InterfaceLayer::InterfaceLayer() : Layer("InterfaceLayer") {}
+
+InterfaceLayer::InterfaceLayer() : Engine::Layer("InterfaceLayer"), myButton("Button", ImVec2(10, 50), ImVec2(100, 100), "../resources/button.png", []() {
+    std::cout << "Good day sir!\n";
+    })
+{
+}
 
 void InterfaceLayer::OnImGuiRender()
 {
@@ -38,5 +43,13 @@ void InterfaceLayer::OnImGuiRender()
     ImGui::SameLine();
     ImGui::Text("counter = %d", counter);
 
+    ImGui::End();
+    ImGui::SetNextWindowPos(ImVec2(10, 200), ImGuiCond_Always);
+    ImGuiWindowFlags windowFlags = 0;
+    if (ImGui::Begin("Buttons", nullptr, windowFlags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse)) // ImGuiWindowFlags_NoCollapse, ImGuiWindowFlags_NoMove and ImGuiWindowFlags_NoResize are not mandatory, it works without them. 
+    {
+        ImGui::Dummy(ImVec2(0.0f, 1.0f));
+        myButton.Render();
+    }
     ImGui::End();
 }
