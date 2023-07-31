@@ -30,69 +30,43 @@ char buffer_pass[11] = "";
 bool isChecked1 = false;
 bool showPass = false;
 
-InterfaceLayer::InterfaceLayer() : 
-
-
-    Engine::Layer("InterfaceLayer"), 
-
-    buttonGit("Button", ImVec2(9, 10), ImVec2(90, 90), "../resources/github_icon.png", []() {
+InterfaceLayer::InterfaceLayer()
+    : Engine::Layer("InterfaceLayer"),
+      buttonGit("Button", ImVec2(9, 10), ImVec2(90, 90), "../resources/github_icon.png", []() {
         const char* url = "https://github.com/Hlebushkek/Engine_Chess3D";
         #ifdef _WIN32
-                OpenURLWindows(url);
-                #elif __APPLE__
-                OpenURLMac(url);
-                #endif
-                
-        })
-
-    {
-    }
+            OpenURLWindows(url);
+        #elif __APPLE__
+            OpenURLMac(url);
+        #endif
+    })
+{}
 
 void InterfaceLayer::OnImGuiRender()
 {
-
-    
-
     ImGui::SetCurrentContext(Engine::ImGuiLayer::GetImguiContext());
 
     if (isWindow2Open)
     {
-    ImGui::Begin("Settings", &isWindow2Open);
-    
-    static int counter = 0;
+        ImGui::Begin("Settings", &isWindow2Open);
+        
+        static int counter = 0;
 
-    ImGui::Dummy(ImVec2(0.0f, 1.0f));
-    ImGui::TextColored(ImVec4(1.0f, 0.0f, 1.0f, 1.0f), "Platform");
-    ImGui::Text("%s", SDL_GetPlatform());
-    ImGui::Text("CPU cores: %d", SDL_GetCPUCount());
-    ImGui::Text("CPU cache size: %d", SDL_GetCPUCacheLineSize());
-    ImGui::Text("RAM: %.2f GB", SDL_GetSystemRAM() / 1024.0f);
-    if (ImGui::Button("Counter button"))
-    {
-        std::cout << "counter button clicked\n";
-        counter++;
+        ImGui::Dummy(ImVec2(0.0f, 1.0f));
+        ImGui::TextColored(ImVec4(1.0f, 0.0f, 1.0f, 1.0f), "Platform");
+        ImGui::Text("%s", SDL_GetPlatform());
+        ImGui::Text("CPU cores: %d", SDL_GetCPUCount());
+        ImGui::Text("CPU cache size: %d", SDL_GetCPUCacheLineSize());
+        ImGui::Text("RAM: %.2f GB", SDL_GetSystemRAM() / 1024.0f);
+        if (ImGui::Button("Counter button"))
+        {
+            std::cout << "counter button clicked\n";
+            counter++;
+        }
+        ImGui::SameLine();
+        ImGui::Text("counter = %d", counter);
+        ImGui::End();
     }
-    ImGui::SameLine();
-    ImGui::Text("counter = %d", counter);
-    ImGui::End();
-    }
-  
-    
-    
-    // Works fine without it
-
-    // int sdl_width = 300, sdl_height = 300, controls_width = 0;
-    // controls_width = sdl_width;
-    // if ((controls_width /= 3) < 300) { controls_width = 300; }
-
-
-    // ImGui::SetNextWindowPos(ImVec2(10, 10), ImGuiCond_Always);
-    // ImGui::SetNextWindowSize(
-    //     ImVec2(static_cast<float>(controls_width), static_cast<float>(sdl_height - 20)),
-    //     ImGuiCond_Always
-    //     );
-
-    
 
     ImGui::SetNextWindowPos(ImVec2(50,920));
     ImGuiWindowFlags windowFlags = 0;
@@ -103,12 +77,8 @@ void InterfaceLayer::OnImGuiRender()
     }
     ImGui::End();
 
-
-    
-    windowFlags = 0;
-    // ImGui::SetCursorPos(ImVec2(800,200));
     ImGui::SetNextWindowSize(ImVec2(300,360));
-    ImGui::SetCurrentContext(Engine::ImGuiLayer::GetImguiContext());
+    windowFlags = 0;
     if (isWindow1Open)
     {
         ImGui::Begin("Welcome to the club, buddy!", &isWindow1Open, windowFlags |= ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize );
@@ -141,7 +111,7 @@ void InterfaceLayer::OnImGuiRender()
     if (ImGui::BeginMainMenuBar()) 
     {
         if (ImGui::BeginMenu("System"))
-         {
+        {
             if (ImGui::MenuItem("Log In", nullptr, &isWindow1Open, true))
             {
                 // isWindow1Open = true;  
