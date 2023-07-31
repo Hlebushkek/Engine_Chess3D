@@ -8,7 +8,8 @@ public:
 	virtual ~InterfaceLayer() = default;
 
 	virtual void OnImGuiRender() override;
-
 private:
-	Engine::Button myButton;
+	Engine::Button buttonGit;
+	bool isWindow1Open; 
+	bool isWindow2Open;
 };
