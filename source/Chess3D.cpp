@@ -4,6 +4,7 @@
 #include "InterfaceLayer.hpp"
 #include "ChessBoardLayer.hpp"
 #include "Block.hpp"
+#include "TestSphere.hpp"
 #include "TestGameObject.hpp"
 #include "ChessBoard.hpp"
 
@@ -16,8 +17,14 @@ Chess3D::Chess3D(const char* title, const int width, const int height)
     ChessBoard *board = new ChessBoard();
     boardLayer->AddRenderableObject(board);
     
-    TestGameObject* testObject = new TestGameObject(glm::vec3(0), Engine::Texture::LoadTexture("Grass.png", GL_TEXTURE_2D));
+    TestGameObject *testObject = new TestGameObject(glm::vec3(0), Engine::Texture::LoadTexture("Grass.png", GL_TEXTURE_2D));
     boardLayer->AddRenderableObject(testObject);
+
+    TestSphere *testSphere = new TestSphere(glm::vec3(0.4f, 0.f, 0.f));
+    boardLayer->AddRenderableObject(testSphere);
+
+    Block *testBlock = new Block(0, "BlockB.png", glm::vec3(0.25f, 0.f, 0.f));
+    boardLayer->AddRenderableObject(testBlock);
     
     InterfaceLayer* interfaceLayer = new InterfaceLayer();
     PushLayer(interfaceLayer);

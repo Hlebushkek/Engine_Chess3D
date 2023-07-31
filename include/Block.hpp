@@ -11,7 +11,7 @@ public:
     Block(uint32_t id, const char* textureFileName, glm::vec3 position);
     Block(uint32_t id, Engine::Texture* texture, glm::vec3 position);
 
-    virtual ~Block();
+    virtual ~Block() {}
 
     void Render(Engine::Shader* shader) override;
 
@@ -22,7 +22,6 @@ private:
     uint32_t id;
 
     Engine::Texture* texture;
-    Engine::BoxCollider* collider;
 
-    void CreateMesh(glm::vec3 position);
+    void CreateMesh();
 };

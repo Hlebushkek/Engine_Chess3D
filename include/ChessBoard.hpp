@@ -11,6 +11,7 @@ public:
     ~ChessBoard();
 
     void Render(Engine::Shader* shader) override;
+    std::optional<Engine::Intersection> CollidesWith(const Ray& ray) override;
 
 private:
     Engine::Texture *textureWhite;

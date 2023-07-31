@@ -39,3 +39,22 @@ void ChessBoard::Render(Engine::Shader *shader)
     for (auto obj : pieces)
         obj->Render(shader);
 }
+
+std::optional<Engine::Intersection> ChessBoard::CollidesWith(const Ray &ray)
+{
+    for (auto obj : boardBlocks)
+    {
+        auto result = obj->CollidesWith(ray);
+        if (result.has_value())
+            return result;
+    }
+
+    for (auto obj : pieces)
+    {
+        auto result = obj->CollidesWith(ray);
+        if (result.has_value())
+            return result;
+    }
+
+    return std::nullopt;
+}
