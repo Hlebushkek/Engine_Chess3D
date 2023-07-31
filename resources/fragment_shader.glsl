@@ -21,6 +21,7 @@ uniform Material material;
 
 uniform vec3 lightPos0;
 uniform vec3 cameraPos;
+uniform bool isTextureBound;
 
 vec3 calcAmbient(Material material)
 {
@@ -62,7 +63,11 @@ void main()
 
 
     //Final light
-    // fs_color = vs_color;
-    // fs_color = texture(material.diffuseTex, vs_texcoord) * (vec4(ambientFinal, 1.f) + vec4(diffuseFinal, 1.f) + vec4(specularFinal, 1.f));
-    fs_color = texture(material.diffuseTex, vs_texcoord) * (vec4(ambientFinal, 1.f) + vec4(diffuseFinal, 1.f) + vec4(1, 1, 1, 1));
+    if (isTextureBound)
+    {
+        // fs_color = texture(material.diffuseTex, vs_texcoord) * (vec4(ambientFinal, 1.f) + vec4(diffuseFinal, 1.f) + vec4(1, 1, 1, 1));
+        fs_color = texture(material.diffuseTex, vs_texcoord) * (vec4(ambientFinal, 1.f) + vec4(diffuseFinal, 1.f) + vec4(specularFinal, 1.f));
+    } else {
+        fs_color = vs_color;
+    }
 }
