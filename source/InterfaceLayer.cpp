@@ -2,7 +2,8 @@
 #ifdef _WIN32
 #include <Windows.h>
 #elif __APPLE__
-#include <AppKit/AppKit.h>
+#include <CoreFoundation/CoreFoundation.h>
+#include <ApplicationServices/ApplicationServices.h>
 #endif
 
 #include <imgui.h>
@@ -13,14 +14,25 @@
 #include "Engine.hpp"
 
 #ifdef _WIN32
-void OpenURLWindows(const char* url) {
+void OpenURLWindows(const char* url)
+{
     ShellExecuteA(NULL, "open", url, NULL, NULL, SW_SHOWNORMAL);
 }
 #endif
 
 #ifdef __APPLE__
-void OpenURLMac(const char* url) {
-    [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:[NSString stringWithUTF8String:url]]];
+void OpenURLMac(const char* url)
+{
+    CFStringRef urlString = CFStringCreateWithCString(kCFAllocatorDefault, url, kCFStringEncodingUTF8);
+    CFURLRef urlRef = CFURLCreateWithString(kCFAllocatorDefault, urlString, NULL);
+
+    if (urlRef)
+    {
+        LSOpenCFURLRef(urlRef, NULL);
+        CFRelease(urlRef);
+    }
+
+    CFRelease(urlString);
 }
 #endif
 

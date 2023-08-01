@@ -12,6 +12,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
 
 if(APPLE)
     enable_language(OBJC)
+    find_library(APPLICATIONSERVICES_FRAMEWORK ApplicationServices)
 endif()
 
 add_subdirectory(GameEngine)
@@ -35,6 +36,9 @@ link_directories(
 add_executable(${PROJECT_NAME} ${SOURCES})
 
 target_link_libraries(${PROJECT_NAME} Engine)
+if(APPLE)
+    target_link_libraries(${PROJECT_NAME} ${APPLICATIONSERVICES_FRAMEWORK})
+endif()
 
 if(APPLE)
     set(LIB_EXT dylib)
