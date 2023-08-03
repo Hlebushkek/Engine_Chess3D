@@ -24,14 +24,6 @@ void OpenURLMac(const char* url) {
 }
 #endif
 
-bool isSettingsOpen = true; 
-bool isLogInOpen = true; 
-bool isLobbiesOpen = false; 
-char buffer_user[11] = "";
-char buffer_pass[11] = "";
-bool isChecked1 = false;
-bool showPass = false;
-
 InterfaceLayer::InterfaceLayer()
     : Engine::Layer("InterfaceLayer"),
       buttonGit("Button", ImVec2(9, 10), ImVec2(90, 90), "../resources/github_icon.png", []() {
@@ -47,6 +39,18 @@ InterfaceLayer::InterfaceLayer()
 void InterfaceLayer::OnImGuiRender()
 {
     ImGui::SetCurrentContext(Engine::ImGuiLayer::GetImguiContext());
+
+    struct User {
+    std::string username;
+    std::string password;
+    };
+
+    std::vector<User> users =
+    {
+    {"kali", "kali"},
+    {"Ostrich", "Warlock"},
+    {"Hlebo", "Bulka"}
+    };
 
     ImGuiStyle& style = ImGui::GetStyle();
 
@@ -109,13 +113,26 @@ void InterfaceLayer::OnImGuiRender()
         }
         ImGui::Text("Password: ");
         ImGui::Checkbox("Show Password", &showPass);
-        ImGui::InputText(("max " + std::to_string(sizeof(buffer_pass) / sizeof(char) - 1) + "##pass").c_str(), buffer_pass, sizeof(buffer_pass), !showPass? ImGuiInputTextFlags_Password : 0);
-        if(ImGui::Button("Login"))
+        ImGui::InputText(("max " + std::to_string(sizeof(buffer_pass) / sizeof(char) - 1) + "##pass").c_str(), buffer_pass, sizeof(buffer_pass), !showPass ? ImGuiInputTextFlags_Password : 0);
+        for (const User& user : users) 
         {
+            if (user.username == buffer_user && user.password == buffer_pass) {
+                loginSuccessful = true;
+                break;}
+            else{
+                loginSuccessful = false;}
+        }
+       
+        {}
+        if(ImGui::Button("Login"))
+        {   
             std::cout << "Login: " << buffer_user << std::endl;
             std::cout << "Password: " << buffer_pass << std::endl;
+            if (loginSuccessful)
+            {
             isLobbiesOpen = true;
             isLogInOpen = false;
+            }
         }
         ImGui::End();
     }
@@ -126,7 +143,6 @@ void InterfaceLayer::OnImGuiRender()
     style.Colors[ImGuiCol_ButtonActive] = ImVec4(0.7f, 0.7f, 0.7f, 0.5f);
     style.Colors[ImGuiCol_TitleBgActive] = ImVec4(0.0f, 0.0f, 0.0f, 1.0f);
     style.Colors[ImGuiCol_TitleBg] = ImVec4(0.0f, 0.0f, 0.0f, 1.0f);
-    
     if (isLobbiesOpen)
     {
         windowFlags = 0;
