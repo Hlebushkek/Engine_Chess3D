@@ -8,8 +8,16 @@ public:
 	virtual ~InterfaceLayer() = default;
 
 	virtual void OnImGuiRender() override;
+
 private:
 	Engine::Button buttonGit;
-	bool isWindow1Open; 
-	bool isWindow2Open;
+	bool loginSuccessful = false;
+	bool isSettingsOpen = true; 
+	bool isLogInOpen = true; 
+	bool isLobbiesOpen = false; 
+	bool isChecked1 = false;
+	bool showPass = false;
+	char buffer_user[11] = "";
+	char buffer_pass[11] = "";
+
 };
