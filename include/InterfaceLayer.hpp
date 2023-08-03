@@ -10,6 +10,8 @@ public:
 	virtual void OnImGuiRender() override;
 private:
 	Engine::Button buttonGit;
-	bool isWindow1Open; 
-	bool isWindow2Open;
+	bool isLogInOpen; 
+	bool isSettingsOpen;
+	bool isLobbiesOpen;
+	
 };

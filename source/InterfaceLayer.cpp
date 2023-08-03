@@ -1,3 +1,4 @@
+
 #ifdef _WIN32
 #include <Windows.h>
 #elif __APPLE__
@@ -23,8 +24,9 @@ void OpenURLMac(const char* url) {
 }
 #endif
 
-bool isWindow1Open = true; 
-bool isWindow2Open = true; 
+bool isSettingsOpen = true; 
+bool isLogInOpen = true; 
+bool isLobbiesOpen = false; 
 char buffer_user[11] = "";
 char buffer_pass[11] = "";
 bool isChecked1 = false;
@@ -46,9 +48,18 @@ void InterfaceLayer::OnImGuiRender()
 {
     ImGui::SetCurrentContext(Engine::ImGuiLayer::GetImguiContext());
 
-    if (isWindow2Open)
+    ImGuiStyle& style = ImGui::GetStyle();
+
+    style.Colors[ImGuiCol_Button] = ImVec4(0.7f, 0.7f, 0.7f, 0.1f);  
+    style.Colors[ImGuiCol_ButtonHovered] = ImVec4(0.7f, 0.7f, 0.7f, 0.3f);  
+    style.Colors[ImGuiCol_ButtonActive] = ImVec4(0.7f, 0.7f, 0.7f, 0.5f); 
+    style.Colors[ImGuiCol_TextSelectedBg] = ImVec4(0.7f, 0.7f, 0.7f, 0.7f); 
+    style.Colors[ImGuiCol_FrameBg] = ImVec4(0.7f, 0.7f, 0.7f, 0.3f);
+    style.Colors[ImGuiCol_TitleBgActive] = ImVec4(0.0f, 0.0f, 0.0f, 1.0f);
+    style.Colors[ImGuiCol_TitleBg] = ImVec4(0.0f, 0.0f, 0.0f, 1.0f);
+    if (isSettingsOpen)
     {
-        ImGui::Begin("Settings", &isWindow2Open);
+        ImGui::Begin("Settings", &isSettingsOpen);
         
         static int counter = 0;
 
@@ -67,6 +78,7 @@ void InterfaceLayer::OnImGuiRender()
         ImGui::Text("counter = %d", counter);
         ImGui::End();
     }
+    style = ImGuiStyle();
 
     ImGui::SetNextWindowPos(ImVec2(50, ImGui::GetIO().DisplaySize.y - buttonGit.GetSize().y - 50));
     ImGuiWindowFlags windowFlags = 0;
@@ -77,52 +89,85 @@ void InterfaceLayer::OnImGuiRender()
     }
     ImGui::End();
 
-    ImGui::SetNextWindowSize(ImVec2(300,360));
+    
+    style.Colors[ImGuiCol_Button] = ImVec4(0.7f, 0.7f, 0.7f, 0.1f);  
+    style.Colors[ImGuiCol_ButtonHovered] = ImVec4(0.7f, 0.7f, 0.7f, 0.3f);  
+    style.Colors[ImGuiCol_ButtonActive] = ImVec4(0.7f, 0.7f, 0.7f, 0.5f); 
+    style.Colors[ImGuiCol_TextSelectedBg] = ImVec4(0.7f, 0.7f, 0.7f, 0.7f); 
+    style.Colors[ImGuiCol_FrameBg] = ImVec4(0.7f, 0.7f, 0.7f, 0.3f);
+    style.Colors[ImGuiCol_TitleBgActive] = ImVec4(0.0f, 0.0f, 0.0f, 1.0f);
+    style.Colors[ImGuiCol_TitleBg] = ImVec4(0.0f, 0.0f, 0.0f, 1.0f);
+    ImGui::SetNextWindowSize(ImVec2(250,300));
     windowFlags = 0;
-    if (isWindow1Open)
-    {
-        ImGui::Begin("Welcome to the club, buddy!", &isWindow1Open, windowFlags |= ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize );
+    if (isLogInOpen)
+    {   
+        ImGui::Begin("Welcome to the club, buddy!", &isLogInOpen, windowFlags |= ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize );
         ImGui::Text("User: ");
-        if(ImGui::InputText("max 10 ", buffer_user, sizeof(buffer_user)))
+        if(ImGui::InputText(("max " + std::to_string(sizeof(buffer_user) / sizeof(char) - 1) + "##user").c_str(), buffer_user, sizeof(buffer_user)))
         {
 
         }
-        ImGui::BeginGroup();
         ImGui::Text("Password: ");
         ImGui::Checkbox("Show Password", &showPass);
-        
-        if (!showPass) 
-        {
-            ImGui::InputText("max 10", buffer_pass, sizeof(buffer_pass), ImGuiInputTextFlags_Password);
-        }
-        else
-        {
-            ImGui::InputText("max 10", buffer_pass, sizeof(buffer_pass));
-        }
-        ImGui::EndGroup();
+        ImGui::InputText(("max " + std::to_string(sizeof(buffer_pass) / sizeof(char) - 1) + "##pass").c_str(), buffer_pass, sizeof(buffer_pass), !showPass? ImGuiInputTextFlags_Password : 0);
         if(ImGui::Button("Login"))
         {
             std::cout << "Login: " << buffer_user << std::endl;
             std::cout << "Password: " << buffer_pass << std::endl;
+            isLobbiesOpen = true;
+            isLogInOpen = false;
         }
         ImGui::End();
     }
+    style = ImGuiStyle();
 
+    style.Colors[ImGuiCol_Button] = ImVec4(0.0f, 0.0f, 0.0f, 0.0f);  
+    style.Colors[ImGuiCol_ButtonHovered] = ImVec4(0.7f, 0.7f, 0.7f, 0.3f);   
+    style.Colors[ImGuiCol_ButtonActive] = ImVec4(0.7f, 0.7f, 0.7f, 0.5f);
+    style.Colors[ImGuiCol_TitleBgActive] = ImVec4(0.0f, 0.0f, 0.0f, 1.0f);
+    style.Colors[ImGuiCol_TitleBg] = ImVec4(0.0f, 0.0f, 0.0f, 1.0f);
+    
+    if (isLobbiesOpen)
+    {
+        windowFlags = 0;
+        ImGui::SetNextWindowSize(ImVec2(500,500));
+        ImGui::Begin("Lobby selection", &isLobbiesOpen, ImGuiWindowFlags_MenuBar);
+        style.ItemSpacing.x = 70.0f; 
+        if (ImGui::BeginMenuBar())
+        {   
+            if (ImGui::Button("Name")) {}
+            if (ImGui::Button("GameType")) {}
+            if (ImGui::Button("Players")) {}
+
+            ImGui::EndMenuBar();
+        }
+        ImGui::Text("Hikaru Nakamura");
+        ImGui::SameLine();
+        ImGui::Text("Bullet 3:2");
+        ImGui::SameLine();
+        ImGui::Text("1/2");
+        ImGui::SameLine();
+        ImGui::Button("Join");
+        ImGui::End();
+    }
+
+    style = ImGuiStyle();
+
+
+    style.Colors[ImGuiCol_MenuBarBg] = ImVec4(0.1f, 0.1f, 0.1f, 1.0f);         // Dark gray menu bar background
+    style.Colors[ImGuiCol_Header] = ImVec4(0.4f, 0.4f, 0.4f, 1.0f);
+    style.Colors[ImGuiCol_HeaderHovered] = ImVec4(0.4f, 0.4f, 0.4f, 1.0f);    // Hovered color for menu items
+    style.Colors[ImGuiCol_HeaderActive] = ImVec4(0.4f, 0.4f, 0.4f, 1.0f);     // Active (pressed) color for menu items  
     if (ImGui::BeginMainMenuBar()) 
     {
         if (ImGui::BeginMenu("System"))
         {
-            if (ImGui::MenuItem("Log In", nullptr, &isWindow1Open, true))
-            {
-                // isWindow1Open = true;  
-            }
-            if (ImGui::MenuItem("Settings", nullptr, &isWindow2Open, true))
-            {
-                // isWindow2Open = true;
-            }
+            if (ImGui::MenuItem("Log In", nullptr, &isLogInOpen, true)){}
+            if (ImGui::MenuItem("Settings", nullptr, &isSettingsOpen, true)){}
             ImGui::EndMenu();
         }
         ImGui::EndMainMenuBar();
     }
+    style = ImGuiStyle();
 
 }
