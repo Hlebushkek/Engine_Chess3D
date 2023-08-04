@@ -7,10 +7,10 @@ Block::Block(uint32_t id, Engine::Texture* texture, glm::vec3 position)
     : GameObject(position, glm::vec3(0.f), glm::vec3(0.0625f))
 {
     this->id = id;
-    this->texture = texture;
+    this->textures.emplace_back(texture);
     this->collider = new Engine::BoxCollider();
 
-    CreateMesh();    
+    CreateMesh();
 }
 
 uint32_t Block::GetID()
@@ -31,13 +31,4 @@ void Block::UpdateMeshSides(int blockFlags)
 
     Engine::Primitive cube = Engine::Cube(blockFlags);
     this->meshes[CUBE] = new Engine::Mesh(cube);
-}
-
-void Block::Render(Engine::Shader* shader)
-{
-    texture->bind(0);
-    shader->set1i(1, "isTextureBound");
-    GameObject::Render(shader);
-    shader->set1i(0, "isTextureBound");
-    texture->unbind(0);
 }
