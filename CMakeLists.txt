@@ -42,8 +42,10 @@ endif()
 
 if(APPLE)
     set(LIB_EXT dylib)
+    set(LIB_PREFIX lib)
 else()
     set(LIB_EXT dll)
+    set(LIB_PREFIX)
 endif()
 
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
