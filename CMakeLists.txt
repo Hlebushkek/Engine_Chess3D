@@ -47,3 +47,13 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
     ${CMAKE_BINARY_DIR}/GameEngine/libEngine.${LIB_EXT}
     ${CMAKE_BINARY_DIR}/
 )
+
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy
+    ${CMAKE_BINARY_DIR}/GameEngine/vendors/SDL/${LIB_PREFIX}SDL3.${LIB_EXT}
+    ${CMAKE_BINARY_DIR}
+
+    COMMAND ${CMAKE_COMMAND} -E copy
+    ${CMAKE_BINARY_DIR}/GameEngine/vendors/SDL_image/${LIB_PREFIX}SDL3_image.${LIB_EXT}
+    ${CMAKE_BINARY_DIR}/
+)
