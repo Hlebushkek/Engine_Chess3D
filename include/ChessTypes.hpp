@@ -10,11 +10,10 @@ enum PieceType
     KING
 };
 
-enum OccupancyType
+enum MoveType
 {
-    EMPTY,
-    WHITE_PIECE,
-    BLACK_PIECE
+    MOVE,
+    CAPTURE
 };
 
 enum PlayerType
