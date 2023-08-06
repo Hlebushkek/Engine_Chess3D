@@ -15,7 +15,11 @@ ChessBoardPieceObject::ChessBoardPieceObject(Engine::Texture* baseTexture, glm::
 
 void ChessBoardPieceObject::OnMouseDown(int button)
 {
-    std::cout << "Select Board Piece" << std::endl;
+    if (!isHighlighted)
+        return;
+
+    ChessBoard *board = (ChessBoard*)this->parent;
+    board->MovePieceTo(this);
 }
 
 void ChessBoardPieceObject::HighlightFor(MoveType type)
@@ -31,9 +35,12 @@ void ChessBoardPieceObject::HighlightFor(MoveType type)
         // SetTexture(attackTexture, 0);
         break;
     }
+
+    isHighlighted = true;
 }
 
 void ChessBoardPieceObject::Reset()
 {
     SetTexture(baseTexture, 0);
+    isHighlighted = false;
 }
