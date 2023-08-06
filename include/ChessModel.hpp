@@ -12,6 +12,8 @@ public:
 
     std::vector<std::pair<glm::ivec2, MoveType>> GetSelectionFor(ChessPiece *piece);
 
+    void MovePiece(glm::ivec2 from, glm::ivec2 to);
+
     ChessPiece *GetPieceAt(glm::ivec2 position);
     ChessPiece *GetPieceAt(int x, int y);
 

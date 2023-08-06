@@ -13,5 +13,5 @@ ChessPieceObject::ChessPieceObject(ChessPiece *pieceModel, glm::vec3 position, g
 void ChessPieceObject::OnMouseDown(int button)
 {
     ChessBoard *board = (ChessBoard*)this->parent;
-    board->UpdateSelection(pieceModel);
+    board->UpdateSelection(this);
 }

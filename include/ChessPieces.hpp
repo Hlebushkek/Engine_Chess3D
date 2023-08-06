@@ -12,6 +12,10 @@ public:
     virtual ~ChessPiece() = default;
 
     virtual std::vector<std::vector<glm::vec2>> GetMoveOffsets() const = 0;
+    virtual std::vector<std::vector<glm::vec2>> GetAdditionalAttackOffsets() const { return {};}
+    virtual bool IsMoveAttackSeparated() const { return true; }
+    virtual bool CanCombine() const { return true; }
+
     virtual Engine::Mesh *GetMesh() const = 0;
     virtual Engine::Texture *GetTexture() const = 0;
 
@@ -33,11 +37,32 @@ public:
     {
         std::vector<std::vector<glm::vec2>> moveOffsets;
         if (this->_player == WHITE)
-            moveOffsets = { { {0, 1} }, { {0, 2} } };
+            moveOffsets = { { {0, 1}, {0, 2} } };
         else
-            moveOffsets = { { {0,-1} }, { {0,-2} } };
+            moveOffsets = { { {0,-1}, {0,-2} } };
 
         return moveOffsets;
+    }
+
+    std::vector<std::vector<glm::vec2>> GetAdditionalAttackOffsets() const override
+    {
+        std::vector<std::vector<glm::vec2>> attackOffsets;
+        if (this->_player == WHITE)
+            attackOffsets = { { {1, 1} }, { {-1, 1} } };
+        else
+            attackOffsets = { { {1,-1} }, { {-1,-1} } };
+
+        return attackOffsets;
+    }
+
+    bool IsMoveAttackSeparated() const override
+    {
+        return false;
+    }
+
+    bool CanCombine() const override
+    {
+        return false;
     }
 
     Engine::Mesh *GetMesh() const override

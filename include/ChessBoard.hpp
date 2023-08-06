@@ -6,7 +6,8 @@
 #include "ChessTypes.hpp"
 #include "ChessModel.hpp"
 
-struct ChessBoardPieceObject;
+class ChessBoardPieceObject;
+class ChessPieceObject;
 
 class ChessBoard : public Engine::GameObject
 {
@@ -14,8 +15,14 @@ public:
     ChessBoard();
     ~ChessBoard() = default;
 
-    void UpdateSelection(ChessPiece* piece);
+    void UpdateSelection(ChessPieceObject *piece);
     void ResetSelection();
+
+    void MovePieceTo(ChessBoardPieceObject *piece);
+
+    void RemovePiece(ChessPiece *pieceModel);
+
+    glm::ivec2 GetPositionFor(ChessBoardPieceObject* piece);
 
     void Render(Engine::Shader* shader) override;
     std::optional<Engine::Intersection> CollidesWith(const Ray& ray) override;
@@ -28,5 +35,7 @@ private:
 
     std::vector<Engine::GameObject*> pieces;
     std::array<std::array<Engine::GameObject*, 8>, 8> boardBlocks;
+
+    ChessPieceObject* selectedPiece = nullptr;
 
 };

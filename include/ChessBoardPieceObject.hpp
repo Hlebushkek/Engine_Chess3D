@@ -13,7 +13,11 @@ public:
     void HighlightFor(MoveType type);
     void Reset();
 
+    GameObject *parent;
+
 private:
+    bool isHighlighted;
+
     Engine::Texture *baseTexture;
     Engine::Texture *moveTexture;
     Engine::Texture *attackTexture;
