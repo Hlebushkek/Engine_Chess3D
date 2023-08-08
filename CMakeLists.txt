@@ -15,9 +15,20 @@ if(APPLE)
     find_library(APPLICATIONSERVICES_FRAMEWORK ApplicationServices)
 endif()
 
+set(Boost_USE_STATIC_LIBS OFF) 
+set(Boost_USE_MULTITHREADED ON)  
+set(Boost_USE_STATIC_RUNTIME OFF)
+
+find_package(Boost)
+
+if(Boost_FOUND)
+    include_directories(${Boost_INCLUDE_DIRS})
+endif()
+
 add_subdirectory(GameEngine)
 include_directories(
     include/
+    externals/net/
     GameEngine
     GameEngine/vendors/SDL/include/
     GameEngine/vendors/SDL_image/include/
@@ -25,7 +36,17 @@ include_directories(
     GameEngine/vendors/imgui/
 )
 
+add_subdirectory(externals/soci)
+
+file(GLOB NET_SOURCES "external/net/*.hpp" "include/NetworkTypes.hpp")
+
+file(GLOB SERVER_SOURCES
+    "source/ChessServer.cpp" "include/ChessServer.hpp"
+    "source/ChessDataBaseOperations.cpp" "include/ChessDataBaseOperations.hpp"
+)
+
 file(GLOB SOURCES "source/*.cpp" "include/*.hpp")
+list(REMOVE_ITEM SOURCES ${SERVER_SOURCES})
 
 link_directories(
     ${PROJECT_SOURCE_DIR}/build/GameEngine/
@@ -33,12 +54,27 @@ link_directories(
     ${PROJECT_SOURCE_DIR}/build/GameEngine/vendors/SDL_image/
 )
 
-add_executable(${PROJECT_NAME} ${SOURCES})
+add_executable(${PROJECT_NAME} ${SOURCES} ${NET_SOURCES})
+add_executable(${PROJECT_NAME}_SERVER ${SERVER_SOURCES} ${NET_SOURCES})
 
 target_link_libraries(${PROJECT_NAME} Engine)
 if(APPLE)
     target_link_libraries(${PROJECT_NAME} ${APPLICATIONSERVICES_FRAMEWORK})
 endif()
+
+if(Boost_FOUND)
+    target_link_libraries(${PROJECT_NAME} ${Boost_LIBRARIES})
+    target_link_libraries(${PROJECT_NAME} wsock32 ws2_32)
+
+    target_link_libraries(${PROJECT_NAME}_SERVER ${Boost_LIBRARIES})
+    target_link_libraries(${PROJECT_NAME}_SERVER wsock32 ws2_32)
+endif()
+
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/externals/soci/cmake/modules)
+find_package(MySQL REQUIRED)
+target_include_directories(${PROJECT_NAME}_SERVER PUBLIC externals/soci/include ${MYSQL_INCLUDE_DIR})
+target_link_directories(${PROJECT_NAME}_SERVER PUBLIC ${CMAKE_BINARY_DIR}/bin)
+target_link_libraries(${PROJECT_NAME}_SERVER soci_mysql)
 
 if(APPLE)
     set(LIB_EXT dylib)
