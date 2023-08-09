@@ -56,9 +56,6 @@ std::vector<std::pair<glm::ivec2, MoveType>> ChessModel::GetSelectionFor(ChessPi
         }
     }
 
-    if (!piece->CanCombine() && result.size() > 0)
-        return result;
-
     bool isMoveAttackSeparated = availableAdditionalAttackOffsets.size() > 0;
     auto availableOffsets = piece->GetMoveOffsets();
     for (const auto& offsetsLine : availableOffsets)
