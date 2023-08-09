@@ -1,5 +1,6 @@
 
 #ifdef _WIN32
+#include <winsock2.h>
 #include <Windows.h>
 #elif __APPLE__
 #include <CoreFoundation/CoreFoundation.h>
@@ -134,16 +135,30 @@ void InterfaceLayer::OnImGuiRender()
             else{
                 loginSuccessful = false;}
         }
-       
-        {}
+        if(ImGui::Button("Register"))
+        {
+            std::cout << "Login: " << buffer_user << std::endl;
+            std::cout << "Password: " << buffer_pass << std::endl;
+
+            (static_cast<Chess3D*>(Chess3D::Get()))->client.Register(buffer_user, buffer_pass);
+
+            if (loginSuccessful)
+            {
+                isLobbiesOpen = true;
+                isLogInOpen = false;
+            }
+        }
         if(ImGui::Button("Login"))
         {   
             std::cout << "Login: " << buffer_user << std::endl;
             std::cout << "Password: " << buffer_pass << std::endl;
+
+            (static_cast<Chess3D*>(Chess3D::Get()))->client.LoginIn(buffer_user, buffer_pass);
+
             if (loginSuccessful)
             {
-            isLobbiesOpen = true;
-            isLogInOpen = false;
+                isLobbiesOpen = true;
+                isLogInOpen = false;
             }
         }
         ImGui::End();

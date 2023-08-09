@@ -11,6 +11,8 @@
 Chess3D::Chess3D(const char* title, const int width, const int height)
     : Engine::Application(title, width, height)
 {
+    client.connect("127.0.0.1", 60000);
+
     ChessBoardLayer* boardLayer = new ChessBoardLayer();
     PushLayer(boardLayer);
 
