@@ -1,0 +1,7 @@
+CREATE TABLE IF NOT EXISTS `chess3d`.`user` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `email` VARCHAR(32) NOT NULL,
+  `name` VARCHAR(32) NOT NULL,
+  `password` VARCHAR(32) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE INDEX `iduser_UNIQUE` (`id` ASC) VISIBLE);

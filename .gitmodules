@@ -4,3 +4,6 @@
 [submodule "externals/net"]
 	path = externals/net
 	url = https://github.com/Hlebushkek/Networking.git
+[submodule "externals/soci"]
+	path = externals/soci
+	url = https://github.com/Hlebushkek/soci.git

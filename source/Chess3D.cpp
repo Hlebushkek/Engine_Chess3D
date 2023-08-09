@@ -11,6 +11,8 @@
 Chess3D::Chess3D(const char* title, const int width, const int height)
     : Engine::Application(title, width, height)
 {
+    client.connect("127.0.0.1", 60000);
+
     ChessBoardLayer* boardLayer = new ChessBoardLayer();
     PushLayer(boardLayer);
 
@@ -28,6 +30,37 @@ Chess3D::Chess3D(const char* title, const int width, const int height)
     
     InterfaceLayer* interfaceLayer = new InterfaceLayer();
     PushLayer(interfaceLayer);
+}
+
+void Chess3D::Update()
+{
+    Engine::Application::Update();
+    UpdateNetwork();
+}
+
+void Chess3D::UpdateNetwork()
+{
+    if (client.isConnected())
+    {
+        if (!client.incoming().empty())
+        {
+            auto msg = client.incoming().pop_front().msg;
+            netMsgDispatcher.DispatchMessage(msg);
+
+            switch (msg.header.id)
+            {
+            case ChessMessage::ServerPing:
+            {
+                std::chrono::system_clock::time_point timeNow = std::chrono::system_clock::now();
+                std::chrono::system_clock::time_point timeThen;
+                msg >> timeThen;
+                std::cout << "Ping: " << std::chrono::duration<double>(timeNow - timeThen).count() << "\n";
+				break;
+            }
+            default: break;
+            }
+        }
+    }
 }
 
 Engine::Application* Engine::CreateApplication()

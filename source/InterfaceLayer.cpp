@@ -1,5 +1,6 @@
 
 #ifdef _WIN32
+#include <winsock2.h>
 #include <Windows.h>
 #elif __APPLE__
 #include <CoreFoundation/CoreFoundation.h>
@@ -46,23 +47,13 @@ InterfaceLayer::InterfaceLayer()
             OpenURLMac(url);
         #endif
     })
-{}
+{
+    (static_cast<Chess3D*>(Chess3D::Get()))->GetNetMessageDispatcher().AddListener(this);
+}
 
 void InterfaceLayer::OnImGuiRender()
 {
     ImGui::SetCurrentContext(Engine::ImGuiLayer::GetImguiContext());
-
-    struct User {
-    std::string username;
-    std::string password;
-    };
-
-    std::vector<User> users =
-    {
-    {"kali", "kali"},
-    {"Ostrich", "Warlock"},
-    {"Hlebo", "Bulka"}
-    };
 
     ImGuiStyle& style = ImGui::GetStyle();
 
@@ -94,6 +85,7 @@ void InterfaceLayer::OnImGuiRender()
         ImGui::Text("counter = %d", counter);
         ImGui::End();
     }
+
     style = ImGuiStyle();
 
     ImGui::SetNextWindowPos(ImVec2(50, ImGui::GetIO().DisplaySize.y - buttonGit.GetSize().y - 50));
@@ -104,7 +96,6 @@ void InterfaceLayer::OnImGuiRender()
         buttonGit.Render();
     }
     ImGui::End();
-
     
     style.Colors[ImGuiCol_Button] = ImVec4(0.7f, 0.7f, 0.7f, 0.1f);  
     style.Colors[ImGuiCol_ButtonHovered] = ImVec4(0.7f, 0.7f, 0.7f, 0.3f);  
@@ -114,37 +105,30 @@ void InterfaceLayer::OnImGuiRender()
     style.Colors[ImGuiCol_TitleBgActive] = ImVec4(0.0f, 0.0f, 0.0f, 1.0f);
     style.Colors[ImGuiCol_TitleBg] = ImVec4(0.0f, 0.0f, 0.0f, 1.0f);
     ImGui::SetNextWindowSize(ImVec2(250,300));
+
     windowFlags = 0;
     if (isLogInOpen)
-    {   
+    {
         ImGui::Begin("Welcome to the club, buddy!", &isLogInOpen, windowFlags |= ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize );
         ImGui::Text("User: ");
-        if(ImGui::InputText(("max " + std::to_string(sizeof(buffer_user) / sizeof(char) - 1) + "##user").c_str(), buffer_user, sizeof(buffer_user)))
-        {
-
-        }
+        ImGui::InputText(("max " + std::to_string(sizeof(buffer_user) / sizeof(char) - 1) + "##user").c_str(), buffer_user, sizeof(buffer_user));
         ImGui::Text("Password: ");
         ImGui::Checkbox("Show Password", &showPass);
         ImGui::InputText(("max " + std::to_string(sizeof(buffer_pass) / sizeof(char) - 1) + "##pass").c_str(), buffer_pass, sizeof(buffer_pass), !showPass ? ImGuiInputTextFlags_Password : 0);
-        for (const User& user : users) 
+
+        if(ImGui::Button("Register"))
         {
-            if (user.username == buffer_user && user.password == buffer_pass) {
-                loginSuccessful = true;
-                break;}
-            else{
-                loginSuccessful = false;}
+            std::cout << "Login: " << buffer_user << std::endl;
+            std::cout << "Password: " << buffer_pass << std::endl;
+
+            (static_cast<Chess3D*>(Chess3D::Get()))->GetClient().Register(buffer_user, buffer_pass);
         }
-       
-        {}
         if(ImGui::Button("Login"))
         {   
             std::cout << "Login: " << buffer_user << std::endl;
             std::cout << "Password: " << buffer_pass << std::endl;
-            if (loginSuccessful)
-            {
-            isLobbiesOpen = true;
-            isLogInOpen = false;
-            }
+
+            (static_cast<Chess3D*>(Chess3D::Get()))->GetClient().LoginIn(buffer_user, buffer_pass);
         }
         ImGui::End();
     }
@@ -181,8 +165,7 @@ void InterfaceLayer::OnImGuiRender()
 
     style = ImGuiStyle();
 
-
-    style.Colors[ImGuiCol_MenuBarBg] = ImVec4(0.1f, 0.1f, 0.1f, 1.0f);         // Dark gray menu bar background
+    style.Colors[ImGuiCol_MenuBarBg] = ImVec4(0.1f, 0.1f, 0.1f, 1.0f);        // Dark gray menu bar background
     style.Colors[ImGuiCol_Header] = ImVec4(0.4f, 0.4f, 0.4f, 1.0f);
     style.Colors[ImGuiCol_HeaderHovered] = ImVec4(0.4f, 0.4f, 0.4f, 1.0f);    // Hovered color for menu items
     style.Colors[ImGuiCol_HeaderActive] = ImVec4(0.4f, 0.4f, 0.4f, 1.0f);     // Active (pressed) color for menu items  
@@ -190,12 +173,35 @@ void InterfaceLayer::OnImGuiRender()
     {
         if (ImGui::BeginMenu("System"))
         {
-            if (ImGui::MenuItem("Log In", nullptr, &isLogInOpen, true)){}
-            if (ImGui::MenuItem("Settings", nullptr, &isSettingsOpen, true)){}
+            ImGui::MenuItem("Log In", nullptr, &isLogInOpen, !loginSuccessful);
+            ImGui::MenuItem("Lobby", nullptr, &isLobbiesOpen, loginSuccessful);
+            ImGui::MenuItem("Settings", nullptr, &isSettingsOpen, true);
             ImGui::EndMenu();
         }
         ImGui::EndMainMenuBar();
     }
     style = ImGuiStyle();
 
+}
+
+void InterfaceLayer::HandleNetMessage(const net::Message<ChessMessage> &msg)
+{
+    switch (msg.header.id)
+    {
+    case ChessMessage::LoginAccepted:
+    {
+        loginSuccessful = true;
+        isLobbiesOpen = true;
+        isLogInOpen = false;
+        std::cout << "Login accepted" << std::endl;
+        break;
+    }
+    case ChessMessage::LoginDenied:
+    {
+        loginSuccessful = false;
+        std::cout << "Login denied" << std::endl;
+        break;
+    }
+    default: break;
+    }
 }
