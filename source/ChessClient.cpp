@@ -19,7 +19,6 @@ void ChessClient::Register(std::string login, std::string password)
     net::Message<ChessMessage> msg;
     msg.header.id = ChessMessage::Register;
 
-    std::cout << "Try register " << login << " " << password << std::endl;
     User user{0, login, login, password};
     msg << user;
 
@@ -31,7 +30,6 @@ void ChessClient::LoginIn(std::string login, std::string password)
     net::Message<ChessMessage> msg;
     msg.header.id = ChessMessage::LoginIn;	
 
-    std::cout << "Try login in " << login << " " << password << std::endl;
     User user{0, login, login, password};
     msg << user;
 
