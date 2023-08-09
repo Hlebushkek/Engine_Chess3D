@@ -10,7 +10,7 @@ enum class ChessMessage : uint32_t
     ServerMessage,
     Register,
     LoginIn,
-    LoginAccept,
+    LoginAccepted,
     LoginDenied,
     Move,
     LobbyCreate,

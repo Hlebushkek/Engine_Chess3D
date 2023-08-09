@@ -16,7 +16,7 @@ int main()
 bool ChessServer::onClientConnect(std::shared_ptr<net::Connection<ChessMessage>> client)
 {
 	net::Message<ChessMessage> msg;
-	msg.header.id = ChessMessage::LoginAccept;
+	msg.header.id = ChessMessage::ServerMessage;
 	client->send(msg);
 	return true;
 }
@@ -59,7 +59,7 @@ void ChessServer::onMessage(std::shared_ptr<net::Connection<ChessMessage>> clien
 			net::Message<ChessMessage> responseMsg;
 			if (successful)
 			{
-				responseMsg.header.id = ChessMessage::LoginAccept;
+				responseMsg.header.id = ChessMessage::LoginAccepted;
 				responseMsg << user;
 			}
 			else
@@ -82,10 +82,19 @@ void ChessServer::onMessage(std::shared_ptr<net::Connection<ChessMessage>> clien
 
 			bool successful = db.LoginIn(user);
 
-			// net::Message<ChessMessage> msg;
-			// msg.header.id = ChessMessage::ServerMessage;
-			// msg << "Login In sucessfull";
-			// client->send(msg);
+			net::Message<ChessMessage> responseMsg;
+			if (successful)
+			{
+				responseMsg.header.id = ChessMessage::LoginAccepted;
+				responseMsg << user;
+			}
+			else
+			{
+				responseMsg.header.id = ChessMessage::LoginDenied;
+				responseMsg << "Login-in failed";
+			}
+			
+			messageClient(client, responseMsg);
 		}
 		break;
 	default:
