@@ -10,7 +10,7 @@
 class ChessDataBaseOperations
 {
 public:
-    ChessDataBaseOperations();
+    ChessDataBaseOperations(std::string schemeName, std::string login, std::string password);
 
     std::vector<User> FetchUsers();
 

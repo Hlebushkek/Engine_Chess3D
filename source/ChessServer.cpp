@@ -1,3 +1,6 @@
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/json_parser.hpp>
+#include <boost/foreach.hpp>
 #include "ChessServer.hpp"
 
 int main()
@@ -11,6 +14,17 @@ int main()
 	}
 
     return 0;
+}
+
+ChessServer::ChessServer(uint16_t nPort)
+	: net::ServerInterface<ChessMessage>(nPort)
+{
+	boost::property_tree::ptree pt;
+    boost::property_tree::read_json("../resources/configs/passwords.json", pt);
+
+    std::string login = pt.get<std::string>("db_credentials.login");
+    std::string password = pt.get<std::string>("db_credentials.password");
+	db = new ChessDataBaseOperations("chess3d", login, password);
 }
 
 bool ChessServer::onClientConnect(std::shared_ptr<net::Connection<ChessMessage>> client)
@@ -54,7 +68,7 @@ void ChessServer::onMessage(std::shared_ptr<net::Connection<ChessMessage>> clien
 
 			std::cout << "Successfuly recieve Register message: " << user.name << " " << user.password << std::endl;
 
-			bool successful = db.Register(user);
+			bool successful = db->Register(user);
 
 			net::Message<ChessMessage> responseMsg;
 			if (successful)
@@ -80,7 +94,7 @@ void ChessServer::onMessage(std::shared_ptr<net::Connection<ChessMessage>> clien
 			std::cout << "Check credentials... " << std::endl;
 			std::cout << "User: " << user.name << " " << user.password << std::endl;
 
-			bool successful = db.LoginIn(user);
+			bool successful = db->LoginIn(user);
 
 			net::Message<ChessMessage> responseMsg;
 			if (successful)

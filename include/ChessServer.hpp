@@ -7,7 +7,7 @@
 class ChessServer : public net::ServerInterface<ChessMessage>
 {
 public:
-    ChessServer(uint16_t nPort) : net::ServerInterface<ChessMessage>(nPort) {}
+    ChessServer(uint16_t nPort);
 
 protected:
     virtual bool onClientConnect(std::shared_ptr<net::Connection<ChessMessage>> client);
@@ -15,6 +15,6 @@ protected:
     virtual void onMessage(std::shared_ptr<net::Connection<ChessMessage>> client, net::Message<ChessMessage>& msg);
 
 private:
-    ChessDataBaseOperations db;
+    ChessDataBaseOperations *db = nullptr;
 
 };
