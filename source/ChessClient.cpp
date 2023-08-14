@@ -35,3 +35,47 @@ void ChessClient::LoginIn(std::string login, std::string password)
 
     this->send(msg);
 }
+
+void ChessClient::CreateLobby(std::string name, std::string password, int user_id)
+{
+    net::Message<ChessMessage> msg;
+    msg.header.id = ChessMessage::LobbyCreate;
+
+    Lobby lobby{0, user_id, std::nullopt, name, password};
+    msg << lobby;
+
+    this->send(msg);
+}
+
+void ChessClient::JoinLobby(int user_id, Lobby& lobby)
+{
+    net::Message<ChessMessage> msg;
+    msg.header.id = ChessMessage::LobbyJoin;
+
+    if (lobby.user_white_id == std::nullopt)
+        lobby.user_white_id = user_id;
+    else if (lobby.user_black_id == std::nullopt)
+        lobby.user_black_id = user_id;
+
+    msg << lobby;
+
+    this->send(msg);
+}
+
+void ChessClient::FetchLobbies()
+{
+    net::Message<ChessMessage> msg;
+    msg.header.id = ChessMessage::LobbyGet;
+
+    this->send(msg);
+}
+
+void ChessClient::LeaveLobby(int user_id, int lobby_id)
+{
+    net::Message<ChessMessage> msg;
+    msg.header.id = ChessMessage::LobbyLeave;
+
+    msg << user_id << lobby_id;
+
+    this->send(msg);
+}

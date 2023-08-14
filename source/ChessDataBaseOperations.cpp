@@ -10,28 +10,8 @@ ChessDataBaseOperations::ChessDataBaseOperations(std::string schemeName, std::st
     CreateTables();
 }
 
-std::vector<User> ChessDataBaseOperations::FetchUsers()
+bool ChessDataBaseOperations::Register(User& user)
 {
-    std::vector<User> users; 
-
-    try
-    {
-        soci::rowset<User> rs = (sql.prepare << "SELECT * FROM user");
-        users.insert(users.end(), rs.begin(), rs.end());
-        std::cout << "Found " << users.size() << " users. Example 0: " << users[0].name << " " << users[0].password << std::endl;
-    }
-    catch (const soci::soci_error& e)
-    {
-        std::cerr << "Error: " << e.what() << std::endl;
-    }
-
-    return users;
-}
-
-bool ChessDataBaseOperations::Register(const User& user)
-{
-    User fetchedUser;
-
     try
     {
         User douplicateUser;
@@ -54,10 +34,10 @@ bool ChessDataBaseOperations::Register(const User& user)
 
         sql << "SELECT * FROM user WHERE name = :name",
             soci::use(user.name, "name"),
-            soci::into(fetchedUser);
+            soci::into(user);
 
         std::cout << "User registered successfully!" << std::endl;
-        std::cout << "Id: " << fetchedUser.id << std::endl;
+        std::cout << "Id: " << user.id << std::endl;
 
         return true;
     }
@@ -69,25 +49,185 @@ bool ChessDataBaseOperations::Register(const User& user)
     return false;
 }
 
-bool ChessDataBaseOperations::LoginIn(const User& user)
+bool ChessDataBaseOperations::LoginIn(User& user)
 {
-    User fetchedUser;
     try
     {
         soci::statement st = (sql.prepare << "SELECT * FROM user WHERE name = :name AND password = :password",
             soci::use(user.name, "name"),
             soci::use(user.password, "password"),
-            soci::into(fetchedUser));
+            soci::into(user));
 
         st.execute();
         if (st.fetch())
         {
-            std::cout << "User login successfully! Id=" << fetchedUser.id << std::endl;
+            std::cout << "User login successfully! Id=" << user.id << std::endl;
             return true;
         } else {
             std::cout << "User not found." << std::endl;
         }
     } catch (const soci::soci_error& e) {
+        std::cerr << "Error: " << e.what() << std::endl;
+    }
+
+    return false;
+}
+
+std::vector<User> ChessDataBaseOperations::FetchUsers()
+{
+    std::vector<User> users; 
+
+    try
+    {
+        soci::rowset<User> rs = (sql.prepare << "SELECT * FROM user");
+        users.insert(users.end(), rs.begin(), rs.end());
+        std::cout << "Found " << users.size() << " users. Example 0: " << users[0].name << " " << users[0].password << std::endl;
+    }
+    catch (const soci::soci_error& e)
+    {
+        std::cerr << "Error: " << e.what() << std::endl;
+    }
+
+    return users;
+}
+
+bool ChessDataBaseOperations::LobbyCreate(Lobby &lobby)
+{
+    try
+    {
+        sql << "INSERT INTO lobby VALUES(NULL, :user_white_id, NULL, :name, :password)",
+            soci::use(lobby.user_white_id.value(), "user_white_id"),
+            soci::use(lobby.name, "name"),
+            soci::use(lobby.password, "password");
+
+        sql << "SELECT * FROM lobby WHERE user_white_id = :user_white_id AND name = :name",
+            soci::use(lobby.user_white_id.value_or(soci::i_null), "user_white_id"),
+            soci::use(lobby.name, "name"),
+            soci::into(lobby);
+
+        std::cout << "Lobby registered successfully!" << std::endl;
+        std::cout << "Id: " << lobby.id << std::endl;
+
+        return true;
+    }
+    catch (const soci::soci_error& e)
+    {
+        std::cerr << "Error: " << e.what() << std::endl;
+    }
+
+    return false;
+}
+
+bool ChessDataBaseOperations::LobbyJoin(Lobby& lobby)
+{
+    try
+    {
+        Lobby fetchedLobby;
+
+        soci::statement st = (sql.prepare << "SELECT * FROM lobby WHERE id = :id",
+            soci::use(lobby.id, "id"),
+            soci::into(fetchedLobby));
+
+        st.execute();
+        if (st.fetch())
+        {
+            if (fetchedLobby.user_white_id != std::nullopt && fetchedLobby.user_black_id != std::nullopt)
+            {
+                std::cout << "Lobby is full." << std::endl;
+                return false;
+            }
+            else if (fetchedLobby.user_white_id == std::nullopt && fetchedLobby.user_black_id == std::nullopt)
+            {
+                std::cout << "Lobby is empty." << std::endl;
+                return false;
+            }
+            else if (fetchedLobby.user_white_id == lobby.user_black_id || fetchedLobby.user_black_id == lobby.user_white_id)
+            {
+                std::cout << "Other user change his side" << std::endl;
+                std::optional<int> temp = lobby.user_black_id;
+                lobby.user_black_id = lobby.user_white_id;
+                lobby.user_white_id = temp;
+            }
+
+            sql << "UPDATE lobby SET user_white_id = :user_white_id, user_black_id = :user_black_id WHERE id = :id",
+            soci::use(lobby.user_white_id.value(), "user_white_id"),
+            soci::use(lobby.user_black_id.value(), "user_black_id"),
+            soci::use(lobby.id, "id"),
+            soci::into(lobby);
+
+            std::cout << "Joined successfully! Id=" << lobby.id << std::endl;
+            return true;
+        }
+        else std::cout << "Lobby not found." << std::endl;
+    }
+    catch (const soci::soci_error& e)
+    {
+        std::cerr << "Error: " << e.what() << std::endl;
+    }
+
+    return false;
+}
+
+std::vector<Lobby> ChessDataBaseOperations::FetchLobbies()
+{
+    std::vector<Lobby> lobbies; 
+
+    try
+    {
+        soci::rowset<Lobby> rs = (sql.prepare << "SELECT * FROM lobby");
+        lobbies.insert(lobbies.end(), rs.begin(), rs.end());
+        std::cout << "Found " << lobbies.size() << " lobbies. Example 0: " << lobbies[0].name << " " << lobbies[0].password << std::endl;
+    }
+    catch (const soci::soci_error& e)
+    {
+        std::cerr << "Error: " << e.what() << std::endl;
+    }
+
+    return lobbies;
+}
+
+bool ChessDataBaseOperations::LobbyLeave(int user_id, int lobby_id)
+{
+    try
+    {
+        Lobby fetchedLobby;
+
+        sql << "SELECT * FROM lobby WHERE id = :id",
+            soci::use(lobby_id, "id"),
+            soci::into(fetchedLobby);
+
+        if (fetchedLobby.user_white_id == std::nullopt || fetchedLobby.user_black_id == std::nullopt)
+            return LobbyDelete(lobby_id);
+
+        if (fetchedLobby.user_white_id == user_id)
+            sql << "UPDATE lobby SET user_white_id = NULL WHERE id = :id",
+                soci::use(lobby_id, "id"),
+                soci::into(fetchedLobby);
+        else
+            sql << "UPDATE lobby SET user_black_id = NULL WHERE id = :id",
+                soci::use(lobby_id, "id"),
+                soci::into(fetchedLobby);
+
+        return true;
+    }
+    catch (const soci::soci_error& e)
+    {
+        std::cerr << "Error: " << e.what() << std::endl;
+    }
+
+    return false;
+}
+
+bool ChessDataBaseOperations::LobbyDelete(int id)
+{
+    try
+    {
+        sql << "DELETE FROM lobby WHERE id = :id",
+            soci::use(id, "id");
+        return true;
+    }
+    catch (const soci::soci_error& e)
+    {
         std::cerr << "Error: " << e.what() << std::endl;
     }
 

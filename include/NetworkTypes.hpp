@@ -1,20 +1,26 @@
 #pragma once
 
 #include <cstdint>
+#include <optional>
 #include <net/NetMessage.hpp>
 
 enum class ChessMessage : uint32_t
 {
+    Error,
     ServerPing,
-    MessageAll,
     ServerMessage,
+    MessageAll,
     Register,
     LoginIn,
     LoginAccepted,
     LoginDenied,
-    Move,
     LobbyCreate,
-    LobbyJoin
+    LobbyJoin,
+    LobbyJoined,
+    LobbyJoinDenied,
+    LobbyLeave,
+    LobbyGet,
+    Move,
 };
 
 struct User
@@ -28,8 +34,8 @@ struct User
 struct Lobby
 {
     int id;
-    int user_white_id;
-    int user_black_id;
+    std::optional<int> user_white_id;
+    std::optional<int> user_black_id;
     std::string name;
     std::string password;
 };
@@ -63,6 +69,19 @@ struct SendableTrait<T, User> {
     static void pull(Message<T>& msg, User& user)
     {
         msg >> user.password >> user.name >> user.email >> user.id;
+    }
+};
+
+template <typename T>
+struct SendableTrait<T, Lobby> {
+    static void push(Message<T>& msg, const Lobby& lobby)
+    {
+        msg << lobby.id << lobby.name << lobby.password << lobby.user_white_id << lobby.user_black_id;
+    }
+
+    static void pull(Message<T>& msg, Lobby& lobby)
+    {
+        msg >> lobby.user_black_id >> lobby.user_white_id >> lobby.password >> lobby.name >> lobby.id;
     }
 };
 

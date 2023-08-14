@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS `chess3d`.`lobby` (
-  `id` INT NOT NULL,
-  `user_white_id` INT NOT NULL,
-  `user_black_id` INT NOT NULL,
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `user_white_id` INT NULL,
+  `user_black_id` INT NULL,
   `name` VARCHAR(32) NOT NULL,
   `password` VARCHAR(32) NULL,
   PRIMARY KEY (`id`),

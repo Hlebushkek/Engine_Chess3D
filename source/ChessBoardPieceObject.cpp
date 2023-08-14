@@ -26,11 +26,11 @@ void ChessBoardPieceObject::HighlightFor(MoveType type)
 {
     switch (type)
     {
-    case MoveType::MOVE:
+    case MoveType::Move:
         RemoveTextureAt(0);
         // SetTexture(moveTexture, 0);
         break;
-    case MoveType::CAPTURE:
+    case MoveType::Capture:
         RemoveTextureAt(0);
         // SetTexture(attackTexture, 0);
         break;
