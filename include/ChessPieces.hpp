@@ -36,7 +36,7 @@ public:
     std::vector<std::vector<glm::vec2>> GetMoveOffsets() const override
     {
         std::vector<std::vector<glm::vec2>> moveOffsets;
-        if (this->_player == WHITE)
+        if (this->_player == PlayerType::White)
             moveOffsets = { { {0, 1}, {0, 2} } };
         else
             moveOffsets = { { {0,-1}, {0,-2} } };
@@ -47,7 +47,7 @@ public:
     std::vector<std::vector<glm::vec2>> GetAdditionalAttackOffsets() const override
     {
         std::vector<std::vector<glm::vec2>> attackOffsets;
-        if (this->_player == WHITE)
+        if (this->_player == PlayerType::White)
             attackOffsets = { { {1, 1} }, { {-1, 1} } };
         else
             attackOffsets = { { {1,-1} }, { {-1,-1} } };

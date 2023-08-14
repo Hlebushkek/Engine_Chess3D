@@ -104,13 +104,89 @@ void ChessServer::onMessage(std::shared_ptr<net::Connection<ChessMessage>> clien
 			}
 			else
 			{
-				responseMsg.header.id = ChessMessage::LoginDenied;
+				responseMsg.header.id = ChessMessage::Error;
 				responseMsg << "Login-in failed";
 			}
 			
 			messageClient(client, responseMsg);
 		}
 		break;
+	case ChessMessage::LobbyCreate:
+		{
+			Lobby lobby;
+			msg >> lobby;
+
+			std::cout << "[" << client->getID() << "]: Create Lobby\n";
+			std::cout << "Lobby: " << lobby.name << " " << lobby.password << std::endl;
+
+			bool successful = db->LobbyCreate(lobby);
+
+			net::Message<ChessMessage> responseMsg;
+			if (successful)
+			{
+				responseMsg.header.id = ChessMessage::LobbyJoined;
+				responseMsg << lobby;
+			}
+			else
+			{
+				responseMsg.header.id = ChessMessage::LobbyJoinDenied;
+				responseMsg << "Lobby creation failed";
+			}
+			
+			messageClient(client, responseMsg);
+		}
+		break;
+	case ChessMessage::LobbyJoin:
+		{
+			Lobby lobby;
+			msg >> lobby;
+
+			std::cout << "[" << client->getID() << "]: Join Lobby\n";
+			std::cout << "Lobby id: " << lobby.id << ". " <<
+						 "User w_id: "  << lobby.user_white_id.value_or(-1) << "; b_id: " << lobby.user_black_id.value_or(-1) << std::endl;
+
+			bool successful = db->LobbyJoin(lobby);
+
+			net::Message<ChessMessage> responseMsg;
+			if (successful)
+			{
+				responseMsg.header.id = ChessMessage::LobbyJoined;
+				responseMsg << lobby;
+			}
+			else
+			{
+				responseMsg.header.id = ChessMessage::LobbyJoinDenied;
+				responseMsg << "Lobby join failed";
+			}
+			
+			messageClient(client, responseMsg);
+		}
+		break;
+	case ChessMessage::LobbyGet:
+		{
+			std::cout << "[" << client->getID() << "]: Get Lobbies\n";
+
+			net::Message<ChessMessage> responseMsg;
+			responseMsg.header.id = ChessMessage::LobbyGet;
+			responseMsg << db->FetchLobbies();
+			
+			messageClient(client, responseMsg);
+		}
+		break;
+	case ChessMessage::LobbyLeave:
+		{
+			std::cout << "[" << client->getID() << "]: Leave lobby\n";
+
+			int user_id, lobby_id;
+			msg >> lobby_id >> user_id;
+
+			db->LobbyLeave(user_id, lobby_id);
+
+			net::Message<ChessMessage> responseMsg;
+			responseMsg.header.id = ChessMessage::LobbyLeave;
+
+			messageClient(client, responseMsg);
+		}
 	default:
 		break;
 	}
