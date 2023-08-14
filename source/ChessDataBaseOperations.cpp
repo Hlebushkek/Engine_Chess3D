@@ -81,7 +81,7 @@ std::vector<User> ChessDataBaseOperations::FetchUsers()
     {
         soci::rowset<User> rs = (sql.prepare << "SELECT * FROM user");
         users.insert(users.end(), rs.begin(), rs.end());
-        std::cout << "Found " << users.size() << " users. Example 0: " << users[0].name << " " << users[0].password << std::endl;
+        std::cout << "Found " << users.size() << " users.\n";
     }
     catch (const soci::soci_error& e)
     {
@@ -176,7 +176,7 @@ std::vector<Lobby> ChessDataBaseOperations::FetchLobbies()
     {
         soci::rowset<Lobby> rs = (sql.prepare << "SELECT * FROM lobby");
         lobbies.insert(lobbies.end(), rs.begin(), rs.end());
-        std::cout << "Found " << lobbies.size() << " lobbies. Example 0: " << lobbies[0].name << " " << lobbies[0].password << std::endl;
+        std::cout << "Found " << lobbies.size() << " lobbies.\n";
     }
     catch (const soci::soci_error& e)
     {
