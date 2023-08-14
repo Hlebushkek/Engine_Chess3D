@@ -4,30 +4,30 @@ ChessModel::ChessModel()
 {
     for (int i = 0; i < 8; i++)
     {
-        boardState[1][i] = ChessPiece::CreatePiece(PieceType::PAWN, PlayerType::WHITE);
-        boardState[6][i] = ChessPiece::CreatePiece(PieceType::PAWN, PlayerType::BLACK);
+        boardState[1][i] = ChessPiece::CreatePiece(PieceType::Pawn, PlayerType::White);
+        boardState[6][i] = ChessPiece::CreatePiece(PieceType::Pawn, PlayerType::Black);
     }
 
-    boardState[0][0] = ChessPiece::CreatePiece(PieceType::ROOK, PlayerType::WHITE);
-    boardState[0][7] = ChessPiece::CreatePiece(PieceType::ROOK, PlayerType::WHITE);
-    boardState[7][0] = ChessPiece::CreatePiece(PieceType::ROOK, PlayerType::BLACK);
-    boardState[7][7] = ChessPiece::CreatePiece(PieceType::ROOK, PlayerType::BLACK);
+    boardState[0][0] = ChessPiece::CreatePiece(PieceType::Rook, PlayerType::White);
+    boardState[0][7] = ChessPiece::CreatePiece(PieceType::Rook, PlayerType::White);
+    boardState[7][0] = ChessPiece::CreatePiece(PieceType::Rook, PlayerType::Black);
+    boardState[7][7] = ChessPiece::CreatePiece(PieceType::Rook, PlayerType::Black);
 
-    boardState[0][1] = ChessPiece::CreatePiece(PieceType::KNIGHT, PlayerType::WHITE);
-    boardState[0][6] = ChessPiece::CreatePiece(PieceType::KNIGHT, PlayerType::WHITE);
-    boardState[7][1] = ChessPiece::CreatePiece(PieceType::KNIGHT, PlayerType::BLACK);
-    boardState[7][6] = ChessPiece::CreatePiece(PieceType::KNIGHT, PlayerType::BLACK);
+    boardState[0][1] = ChessPiece::CreatePiece(PieceType::Knight, PlayerType::White);
+    boardState[0][6] = ChessPiece::CreatePiece(PieceType::Knight, PlayerType::White);
+    boardState[7][1] = ChessPiece::CreatePiece(PieceType::Knight, PlayerType::Black);
+    boardState[7][6] = ChessPiece::CreatePiece(PieceType::Knight, PlayerType::Black);
     
-    boardState[0][2] = ChessPiece::CreatePiece(PieceType::BISHOP, PlayerType::WHITE);
-    boardState[0][5] = ChessPiece::CreatePiece(PieceType::BISHOP, PlayerType::WHITE);
-    boardState[7][2] = ChessPiece::CreatePiece(PieceType::BISHOP, PlayerType::BLACK);
-    boardState[7][5] = ChessPiece::CreatePiece(PieceType::BISHOP, PlayerType::BLACK);
+    boardState[0][2] = ChessPiece::CreatePiece(PieceType::Bishop, PlayerType::White);
+    boardState[0][5] = ChessPiece::CreatePiece(PieceType::Bishop, PlayerType::White);
+    boardState[7][2] = ChessPiece::CreatePiece(PieceType::Bishop, PlayerType::Black);
+    boardState[7][5] = ChessPiece::CreatePiece(PieceType::Bishop, PlayerType::Black);
 
-    boardState[0][3] = ChessPiece::CreatePiece(PieceType::QUEEN, PlayerType::WHITE);
-    boardState[7][3] = ChessPiece::CreatePiece(PieceType::QUEEN, PlayerType::BLACK);
+    boardState[0][3] = ChessPiece::CreatePiece(PieceType::Queen, PlayerType::White);
+    boardState[7][3] = ChessPiece::CreatePiece(PieceType::Queen, PlayerType::Black);
     
-    boardState[0][4] = ChessPiece::CreatePiece(PieceType::KING, PlayerType::WHITE);
-    boardState[7][4] = ChessPiece::CreatePiece(PieceType::KING, PlayerType::BLACK);
+    boardState[0][4] = ChessPiece::CreatePiece(PieceType::King, PlayerType::White);
+    boardState[7][4] = ChessPiece::CreatePiece(PieceType::King, PlayerType::Black);
 
     for (int y = 2; y < 6; y++)
         for (int x = 0; x < 8; x++)
@@ -52,7 +52,7 @@ std::vector<std::pair<glm::ivec2, MoveType>> ChessModel::GetSelectionFor(ChessPi
 
             ChessPiece *otherPiece = GetPieceAt(testPosition);
             if (otherPiece && otherPiece->GetPlayer() != player)
-                result.emplace_back(std::make_pair(testPosition, MoveType::CAPTURE));
+                result.emplace_back(std::make_pair(testPosition, MoveType::Capture));
         }
     }
 
@@ -69,14 +69,14 @@ std::vector<std::pair<glm::ivec2, MoveType>> ChessModel::GetSelectionFor(ChessPi
 
             ChessPiece *otherPiece = GetPieceAt(testPosition);
             if (!otherPiece)
-                result.emplace_back(std::make_pair(testPosition, MoveType::MOVE));
+                result.emplace_back(std::make_pair(testPosition, MoveType::Move));
             else if (otherPiece->GetPlayer() != player && !isMoveAttackSeparated)
             {
                 if (findEnemy)
                    break;
                 else
                 {
-                    result.emplace_back(std::make_pair(testPosition, MoveType::CAPTURE));
+                    result.emplace_back(std::make_pair(testPosition, MoveType::Capture));
                     findEnemy = true;
                 }
             }

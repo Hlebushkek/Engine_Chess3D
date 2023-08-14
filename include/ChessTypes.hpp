@@ -1,24 +1,24 @@
 #pragma once
 
-enum PieceType
+enum class PieceType
 {
-    PAWN,
-    KNIGHT,
-    BISHOP,
-    ROOK,
-    QUEEN,
-    KING
+    Pawn,
+    Knight,
+    Bishop,
+    Rook,
+    Queen,
+    King
 };
 
-enum MoveType
+enum class MoveType
 {
-    MOVE,
-    CAPTURE
+    Move,
+    Capture
 };
 
-enum PlayerType
+enum class PlayerType
 {
-    WHITE,
-    BLACK,
-    SPECTATOR
+    White,
+    Black,
+    Spectator
 };
