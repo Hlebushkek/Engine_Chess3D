@@ -282,6 +282,7 @@ void InterfaceLayer::HandleNetMessage(const net::Message<ChessMessage> &msg)
         currentLobby = lobby;
         isLobbyMenuOpen = true;
         std::cout << "Lobby joined. " << lobby.name << ", " << lobby.password << std::endl;
+        FetchLobbies();
         break;
     }
     case ChessMessage::LobbyJoinDenied:
