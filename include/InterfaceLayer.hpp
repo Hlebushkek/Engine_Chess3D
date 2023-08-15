@@ -21,10 +21,13 @@ private:
 	bool isLogInOpen = true; 
 	bool isLobbiesOpen = false; 
 	bool isLobbyMenuOpen = false;
+	bool isRegisterationOpen = false;
 	bool isChecked1 = false;
 	bool showPass = false;
 	char buffer_user[32] = "";
 	char buffer_pass[32] = "";
+	char buffer_email[64] = "";
+	ImVec2 lastClosedWindowPos;
 
 	User user;
 

@@ -122,22 +122,56 @@ void InterfaceLayer::OnImGuiRender()
         ImGui::Text("User: ");
         ImGui::InputText(("max " + std::to_string(sizeof(buffer_user) / sizeof(char) - 1) + "##user").c_str(), buffer_user, sizeof(buffer_user));
         ImGui::Text("Password: ");
-        ImGui::Checkbox("Show Password", &showPass);
         ImGui::InputText(("max " + std::to_string(sizeof(buffer_pass) / sizeof(char) - 1) + "##pass").c_str(), buffer_pass, sizeof(buffer_pass), !showPass ? ImGuiInputTextFlags_Password : 0);
+        ImGui::Checkbox("Show Password", &showPass);
 
-        if(ImGui::Button("Register"))
-        {
-            std::cout << "Login: " << buffer_user << std::endl;
-            std::cout << "Password: " << buffer_pass << std::endl;
-
-            client().Register(buffer_user, buffer_pass);
-        }
         if(ImGui::Button("Login"))
         {   
             std::cout << "Login: " << buffer_user << std::endl;
             std::cout << "Password: " << buffer_pass << std::endl;
 
             client().LoginIn(buffer_user, buffer_pass);
+        }
+
+        ImGui::SetCursorPos(ImVec2(8, ImGui::GetWindowHeight() - buttonGit.GetSize().y + 55));
+        if(ImGui::Button("Create a new account"))
+        {   
+            lastClosedWindowPos = ImGui::GetWindowPos();
+            ImGui::SetNextWindowPos(lastClosedWindowPos);
+            isRegisterationOpen = true;
+            isLogInOpen = false;
+        }
+
+        ImGui::End();
+    }
+
+    if (isRegisterationOpen)
+    {
+        ImGui::SetNextWindowSize(ImVec2(250,300));
+
+        ImGui::Begin("Registration", &isLogInOpen, windowFlags |= ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize);
+        ImGui::Text("Write your email: ");
+        ImGui::InputText(("max " + std::to_string(sizeof(buffer_email) / sizeof(char) - 1) + "##email").c_str(), buffer_email, sizeof(buffer_email));
+        ImGui::Text("Create your login: ");
+        ImGui::InputText(("max " + std::to_string(sizeof(buffer_user) / sizeof(char) - 1) + "##user").c_str(), buffer_user, sizeof(buffer_user));
+        ImGui::Text("Create your Password: ");
+        ImGui::InputText(("max " + std::to_string(sizeof(buffer_pass) / sizeof(char) - 1) + "##pass").c_str(), buffer_pass, sizeof(buffer_pass), !showPass ? ImGuiInputTextFlags_Password : 0);
+        ImGui::Checkbox("Show Password", &showPass);
+
+        if(ImGui::Button("Register "))
+        {   
+            client().Register(buffer_email, buffer_user, buffer_pass);
+            isRegisterationOpen = true;
+            isLogInOpen = false;
+        }
+
+        ImGui::SetCursorPos(ImVec2(8, ImGui::GetWindowHeight() - buttonGit.GetSize().y + 55));
+        if(ImGui::Button("back to log in window"))
+        {   
+            lastClosedWindowPos = ImGui::GetWindowPos();
+            ImGui::SetNextWindowPos(lastClosedWindowPos);
+            isLogInOpen = true;
+            isRegisterationOpen = false;
         }
         ImGui::End();
     }

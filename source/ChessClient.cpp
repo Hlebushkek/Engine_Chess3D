@@ -14,12 +14,12 @@ void ChessClient::PingServer()
     this->send(msg);
 }
 
-void ChessClient::Register(std::string login, std::string password)
+void ChessClient::Register(std::string email, std::string login, std::string password)
 {
     net::Message<ChessMessage> msg;
     msg.header.id = ChessMessage::Register;
 
-    User user{0, login, login, password};
+    User user{0, email, login, password};
     msg << user;
 
     this->send(msg);
