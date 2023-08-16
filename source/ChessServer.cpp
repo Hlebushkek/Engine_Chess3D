@@ -1,6 +1,5 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
-#include <boost/foreach.hpp>
 #include "ChessServer.hpp"
 
 int main()
@@ -81,7 +80,9 @@ void ChessServer::onMessage(std::shared_ptr<net::Connection<ChessMessage>> clien
 				responseMsg.header.id = ChessMessage::LoginDenied;
 				responseMsg << "Registeration failed";
 			}
-			
+
+			client->setID(user.id);
+			userToConnection.insert_or_assign(user.id, client);
 			messageClient(client, responseMsg);
 		}
 		break;
@@ -107,7 +108,9 @@ void ChessServer::onMessage(std::shared_ptr<net::Connection<ChessMessage>> clien
 				responseMsg.header.id = ChessMessage::Error;
 				responseMsg << "Login-in failed";
 			}
-			
+
+			client->setID(user.id);
+			userToConnection.emplace(user.id, client);
 			messageClient(client, responseMsg);
 		}
 		break;
@@ -162,12 +165,12 @@ void ChessServer::onMessage(std::shared_ptr<net::Connection<ChessMessage>> clien
 			messageClient(client, responseMsg);
 		}
 		break;
-	case ChessMessage::LobbyGet:
+	case ChessMessage::LobbiesGet:
 		{
 			std::cout << "[" << client->getID() << "]: Get Lobbies\n";
 
 			net::Message<ChessMessage> responseMsg;
-			responseMsg.header.id = ChessMessage::LobbyGet;
+			responseMsg.header.id = ChessMessage::LobbiesGet;
 			responseMsg << db->FetchLobbies();
 			
 			messageClient(client, responseMsg);
@@ -187,6 +190,30 @@ void ChessServer::onMessage(std::shared_ptr<net::Connection<ChessMessage>> clien
 
 			messageClient(client, responseMsg);
 		}
+		break;
+	case ChessMessage::GameStart:
+		{
+			std::cout << "[" << client->getID() << "]: Start lobby\n";
+
+			int lobby_id;
+			msg >> lobby_id;
+
+			Lobby lobby{lobby_id};
+			db->LobbyGet(lobby);
+
+			bool isLobbyFull = lobby.user_white_id.has_value() && lobby.user_black_id.has_value();
+			if (isLobbyFull)
+				this->activeGames.emplace_back(std::make_shared<ChessGameOnline>(lobby));
+
+			net::Message<ChessMessage> responseMsg;
+			responseMsg.header.id = isLobbyFull ? ChessMessage::GameStarted : ChessMessage::GameStartDenied;
+
+			if (lobby.user_white_id.has_value())
+				messageClient(userToConnection[lobby.user_white_id.value()], responseMsg);
+			if (lobby.user_black_id.has_value())
+				messageClient(userToConnection[lobby.user_black_id.value()], responseMsg);
+		}
+		break;
 	default:
 		break;
 	}

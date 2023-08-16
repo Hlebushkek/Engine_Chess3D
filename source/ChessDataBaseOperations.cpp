@@ -150,15 +150,33 @@ bool ChessDataBaseOperations::LobbyJoin(Lobby& lobby)
             }
 
             sql << "UPDATE lobby SET user_white_id = :user_white_id, user_black_id = :user_black_id WHERE id = :id",
-            soci::use(lobby.user_white_id.value(), "user_white_id"),
-            soci::use(lobby.user_black_id.value(), "user_black_id"),
-            soci::use(lobby.id, "id"),
-            soci::into(lobby);
+                soci::use(lobby.user_white_id.value(), "user_white_id"),
+                soci::use(lobby.user_black_id.value(), "user_black_id"),
+                soci::use(lobby.id, "id"),
+                soci::into(lobby);
 
             std::cout << "Joined successfully! Id=" << lobby.id << std::endl;
             return true;
         }
         else std::cout << "Lobby not found." << std::endl;
+    }
+    catch (const soci::soci_error& e)
+    {
+        std::cerr << "Error: " << e.what() << std::endl;
+    }
+
+    return false;
+}
+
+bool ChessDataBaseOperations::LobbyGet(Lobby &lobby)
+{
+    try
+    {
+        sql << "SELECT * FROM lobby WHERE id = :id",
+            soci::use(lobby.id, "id"),
+            soci::into(lobby);
+
+        return true;
     }
     catch (const soci::soci_error& e)
     {

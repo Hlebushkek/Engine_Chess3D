@@ -20,6 +20,11 @@ enum class ChessMessage : uint32_t
     LobbyJoinDenied,
     LobbyLeave,
     LobbyGet,
+    LobbiesGet,
+    GameStart,
+    GameStarted,
+    GameStartDenied,
+    GameEnd,
     Move,
 };
 

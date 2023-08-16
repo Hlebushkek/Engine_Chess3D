@@ -65,7 +65,7 @@ void ChessClient::JoinLobby(int user_id, Lobby& lobby)
 void ChessClient::FetchLobbies()
 {
     net::Message<ChessMessage> msg;
-    msg.header.id = ChessMessage::LobbyGet;
+    msg.header.id = ChessMessage::LobbiesGet;
 
     this->send(msg);
 }
@@ -76,6 +76,16 @@ void ChessClient::LeaveLobby(int user_id, int lobby_id)
     msg.header.id = ChessMessage::LobbyLeave;
 
     msg << user_id << lobby_id;
+
+    this->send(msg);
+}
+
+void ChessClient::StartGame(int lobby_id)
+{
+    net::Message<ChessMessage> msg;
+    msg.header.id = ChessMessage::GameStart;
+
+    msg << lobby_id;
 
     this->send(msg);
 }

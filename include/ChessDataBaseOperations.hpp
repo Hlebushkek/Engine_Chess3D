@@ -18,6 +18,7 @@ public:
 
     bool LobbyCreate(Lobby& lobby);
     bool LobbyJoin(Lobby& lobby);
+    bool LobbyGet(Lobby& lobby);
     std::vector<Lobby> FetchLobbies();
     bool LobbyLeave(int user_id, int lobby_id);
     bool LobbyDelete(int id);

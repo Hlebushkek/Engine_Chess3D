@@ -43,6 +43,7 @@ file(GLOB NET_SOURCES "external/net/*.hpp" "include/NetworkTypes.hpp")
 file(GLOB SERVER_SOURCES
     "source/ChessServer.cpp" "include/ChessServer.hpp"
     "source/ChessDataBaseOperations.cpp" "include/ChessDataBaseOperations.hpp"
+    "source/ChessGameOnline.cpp" "include/ChessGameOnline.hpp" "include/ChessGameInterface.hpp"
 )
 
 file(GLOB SOURCES "source/*.cpp" "include/*.hpp")

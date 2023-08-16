@@ -32,7 +32,7 @@ Chess3D::Chess3D(const char* title, const int width, const int height)
     // AddLight(new Engine::PointLight(glm::vec3(0.5f, 0.2f, -0.25f)));
     AddLight(new Engine::SpotLight(glm::vec3(0.71875f, 0.4f, -0.21875f)));
     // AddLight(new Engine::DirectionalLight(glm::vec3(0.f, -0.5f, -0.5f)));
-    
+
     InterfaceLayer* interfaceLayer = new InterfaceLayer();
     PushLayer(interfaceLayer);
 }

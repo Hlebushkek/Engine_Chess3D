@@ -220,7 +220,8 @@ void InterfaceLayer::OnImGuiRender()
         if (ImGui::Button("Leave"))
             client().LeaveLobby(user.id, currentLobby.id);
         ImGui::SameLine();
-        ImGui::Button("Start");
+        if (ImGui::Button("Start"))
+            client().StartGame(currentLobby.id);
         ImGui::End();
     }
 
@@ -267,7 +268,7 @@ void InterfaceLayer::HandleNetMessage(const net::Message<ChessMessage> &msg)
         std::cout << "Login denied" << std::endl;
         break;
     }
-    case ChessMessage::LobbyGet:
+    case ChessMessage::LobbiesGet:
     {
         std::cout << "Lobby get" << std::endl;
         auto msgCopy = msg;
@@ -298,6 +299,16 @@ void InterfaceLayer::HandleNetMessage(const net::Message<ChessMessage> &msg)
         isLobbyMenuOpen = false;
         currentLobby = {};
         FetchLobbies();
+        break;
+    }
+    case ChessMessage::GameStarted:
+    {
+        std::cout << "Game Started";
+        break;
+    }
+    case ChessMessage::GameStartDenied:
+    {
+        std::cout << "Game Start Denied";
         break;
     }
     default: break;

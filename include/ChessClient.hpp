@@ -16,6 +16,7 @@ public:
     void JoinLobby(int user_id, Lobby& lobby);
     void FetchLobbies();
     void LeaveLobby(int user_id, int lobby_id);
+    void StartGame(int lobby_id);
 
 private:
 
