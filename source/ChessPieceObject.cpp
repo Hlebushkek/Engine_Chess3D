@@ -5,8 +5,8 @@ ChessPieceObject::ChessPieceObject(ChessPiece *pieceModel, glm::vec3 position, g
     : GameObject(position, rotation, scale)
 {
     this->pieceModel = pieceModel;
-    this->meshes.emplace_back(pieceModel->GetMesh());
-    this->textures.emplace_back(pieceModel->GetTexture());
+    this->meshes.push_back(pieceModel->GetMesh());
+    this->textures.push_back(pieceModel->GetTexture());
     this->collider = new Engine::BoxCollider();
 }
 

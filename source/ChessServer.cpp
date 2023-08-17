@@ -162,12 +162,12 @@ void ChessServer::onMessage(std::shared_ptr<net::Connection<ChessMessage>> clien
 			messageClient(client, responseMsg);
 		}
 		break;
-	case ChessMessage::LobbyGet:
+	case ChessMessage::LobbiesGet:
 		{
 			std::cout << "[" << client->getID() << "]: Get Lobbies\n";
 
 			net::Message<ChessMessage> responseMsg;
-			responseMsg.header.id = ChessMessage::LobbyGet;
+			responseMsg.header.id = ChessMessage::LobbiesGet;
 			responseMsg << db->FetchLobbies();
 			
 			messageClient(client, responseMsg);

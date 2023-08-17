@@ -65,7 +65,7 @@ void ChessClient::JoinLobby(int user_id, Lobby& lobby)
 void ChessClient::FetchLobbies()
 {
     net::Message<ChessMessage> msg;
-    msg.header.id = ChessMessage::LobbyGet;
+    msg.header.id = ChessMessage::LobbiesGet;
 
     this->send(msg);
 }

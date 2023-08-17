@@ -7,7 +7,7 @@ Block::Block(uint32_t id, Engine::Texture* texture, glm::vec3 position)
     : GameObject(position, glm::vec3(0.f), glm::vec3(0.0625f))
 {
     this->id = id;
-    this->textures.emplace_back(texture);
+    this->textures.push_back(texture);
     this->collider = new Engine::BoxCollider();
 
     CreateMesh();

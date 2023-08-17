@@ -2,18 +2,18 @@
 #ifdef _WIN32
 #include <winsock2.h>
 #include <Windows.h>
-#elif __APPLE__
+#elif defined(__APPLE__)
 #include <CoreFoundation/CoreFoundation.h>
 #include <ApplicationServices/ApplicationServices.h>
 #endif
 
 #include <string>
 #include <imgui.h>
-#include <backends/imgui_impl_sdl3.h>
-#include <backends/imgui_impl_opengl3.h>
+#include <Engine.hpp>
 #include "InterfaceLayer.hpp"
+#include "GUISettingsWindow.hpp"
+#include "GUIAuthorizationWindow.hpp"
 #include "Chess3D.hpp"
-#include "Engine.hpp"
 
 #ifdef _WIN32
 void OpenURLWindows(const char* url)
@@ -41,22 +41,31 @@ void OpenURLMac(const char* url)
 ChessClient& client() { return (static_cast<Chess3D*>(Chess3D::Get()))->GetClient(); }
 
 InterfaceLayer::InterfaceLayer()
-    : Engine::Layer("InterfaceLayer"),
-      buttonGit("Button", ImVec2(9, 10), ImVec2(90, 90), "../resources/github_icon.png", []() {
+    : Engine::Layer("InterfaceLayer"), buttonGit("##gitButton", ImVec2(9, 10), ImVec2(90, 90), "../resources/github_icon.png")
+{
+    (static_cast<Chess3D*>(Chess3D::Get()))->GetNetMessageDispatcher().AddListener(this);
+
+    buttonGit.SetOnClick([]() {
         const char* url = "https://github.com/Hlebushkek/Engine_Chess3D";
         #ifdef _WIN32
             OpenURLWindows(url);
         #elif __APPLE__
             OpenURLMac(url);
         #endif
-    })
-{
-    (static_cast<Chess3D*>(Chess3D::Get()))->GetNetMessageDispatcher().AddListener(this);
+    });
+
+    settingsWindow = std::make_shared<GUISettingsWindow>();
+    authorizationWindow = std::make_shared<GUIAuthorizationWindow>();
+    lobbiesListWindow = std::make_shared<GUILobbiesListWindow>();
+    this->windows.push_back(settingsWindow);
+    this->windows.push_back(authorizationWindow);
+    this->windows.push_back(lobbiesListWindow);
 }
 
-void InterfaceLayer::FetchLobbies()
+void InterfaceLayer::OnAttach()
 {
-    client().FetchLobbies();
+    authorizationWindow->delegate = weak_from_this();
+    lobbiesListWindow->delegate = weak_from_this();
 }
 
 void InterfaceLayer::OnImGuiRender()
@@ -64,7 +73,6 @@ void InterfaceLayer::OnImGuiRender()
     ImGui::SetCurrentContext(Engine::ImGuiLayer::GetImguiContext());
 
     ImGuiStyle& style = ImGui::GetStyle();
-
     style.Colors[ImGuiCol_Button] = ImVec4(0.7f, 0.7f, 0.7f, 0.1f);  
     style.Colors[ImGuiCol_ButtonHovered] = ImVec4(0.7f, 0.7f, 0.7f, 0.3f);  
     style.Colors[ImGuiCol_ButtonActive] = ImVec4(0.7f, 0.7f, 0.7f, 0.5f); 
@@ -72,30 +80,10 @@ void InterfaceLayer::OnImGuiRender()
     style.Colors[ImGuiCol_FrameBg] = ImVec4(0.7f, 0.7f, 0.7f, 0.3f);
     style.Colors[ImGuiCol_TitleBgActive] = ImVec4(0.0f, 0.0f, 0.0f, 1.0f);
     style.Colors[ImGuiCol_TitleBg] = ImVec4(0.0f, 0.0f, 0.0f, 1.0f);
-    if (isSettingsOpen)
-    {
-        ImGui::Begin("Settings", &isSettingsOpen);
-        
-        static int counter = 0;
 
-        ImGui::Dummy(ImVec2(0.0f, 1.0f));
-        ImGui::TextColored(ImVec4(1.0f, 0.0f, 1.0f, 1.0f), "Platform");
-        ImGui::Text("%s", SDL_GetPlatform());
-        ImGui::Text("CPU cores: %d", SDL_GetCPUCount());
-        ImGui::Text("CPU cache size: %d", SDL_GetCPUCacheLineSize());
-        ImGui::Text("RAM: %.2f GB", SDL_GetSystemRAM() / 1024.0f);
-        if (ImGui::Button("Counter button"))
-        {
-            std::cout << "counter button clicked\n";
-            counter++;
-        }
-        ImGui::SameLine();
-        ImGui::Text("counter = %d", counter);
-        ImGui::End();
-    }
-
-    style = ImGuiStyle();
-
+    for (auto window : windows)
+        window->Render();
+    
     ImGui::SetNextWindowPos(ImVec2(50, ImGui::GetIO().DisplaySize.y - buttonGit.GetSize().y - 50));
     ImGuiWindowFlags windowFlags = 0;
     if (ImGui::Begin("Buttons", nullptr, windowFlags |= ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground |  ImGuiWindowFlags_NoResize  | ImGuiWindowFlags_NoCollapse| ImGuiWindowFlags_AlwaysAutoResize )) // ImGuiWindowFlags_NoCollapse, ImGuiWindowFlags_NoMove and ImGuiWindowFlags_NoResize are not mandatory, it works without them. 
@@ -104,147 +92,7 @@ void InterfaceLayer::OnImGuiRender()
         buttonGit.Render();
     }
     ImGui::End();
-    
-    style.Colors[ImGuiCol_Button] = ImVec4(0.7f, 0.7f, 0.7f, 0.1f);  
-    style.Colors[ImGuiCol_ButtonHovered] = ImVec4(0.7f, 0.7f, 0.7f, 0.3f);  
-    style.Colors[ImGuiCol_ButtonActive] = ImVec4(0.7f, 0.7f, 0.7f, 0.5f); 
-    style.Colors[ImGuiCol_TextSelectedBg] = ImVec4(0.7f, 0.7f, 0.7f, 0.7f); 
-    style.Colors[ImGuiCol_FrameBg] = ImVec4(0.7f, 0.7f, 0.7f, 0.3f);
-    style.Colors[ImGuiCol_TitleBgActive] = ImVec4(0.0f, 0.0f, 0.0f, 1.0f);
-    style.Colors[ImGuiCol_TitleBg] = ImVec4(0.0f, 0.0f, 0.0f, 1.0f);
 
-    windowFlags = 0;
-    if (isLogInOpen)
-    {
-        ImGui::SetNextWindowSize(ImVec2(250,300));
-
-        ImGui::Begin("Welcome to the club, buddy!", &isLogInOpen, windowFlags |= ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize);
-        ImGui::Text("User: ");
-        ImGui::InputText(("max " + std::to_string(sizeof(buffer_user) / sizeof(char) - 1) + "##user").c_str(), buffer_user, sizeof(buffer_user));
-        ImGui::Text("Password: ");
-        ImGui::InputText(("max " + std::to_string(sizeof(buffer_pass) / sizeof(char) - 1) + "##pass").c_str(), buffer_pass, sizeof(buffer_pass), !showPass ? ImGuiInputTextFlags_Password : 0);
-        ImGui::Checkbox("Show Password", &showPass);
-
-        if(ImGui::Button("Login"))
-        {   
-            std::cout << "Login: " << buffer_user << std::endl;
-            std::cout << "Password: " << buffer_pass << std::endl;
-
-            client().LoginIn(buffer_user, buffer_pass);
-        }
-
-        ImGui::SetCursorPos(ImVec2(8, ImGui::GetWindowHeight() - buttonGit.GetSize().y + 55));
-        if(ImGui::Button("Create a new account"))
-        {   
-            lastClosedWindowPos = ImGui::GetWindowPos();
-            ImGui::SetNextWindowPos(lastClosedWindowPos);
-            isRegisterationOpen = true;
-            isLogInOpen = false;
-        }
-
-        ImGui::End();
-    }
-
-    if (isRegisterationOpen)
-    {
-        ImGui::SetNextWindowSize(ImVec2(250,300));
-
-        ImGui::Begin("Registration", &isLogInOpen, windowFlags |= ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize);
-        ImGui::Text("Write your email: ");
-        ImGui::InputText(("max " + std::to_string(sizeof(buffer_email) / sizeof(char) - 1) + "##email").c_str(), buffer_email, sizeof(buffer_email));
-        ImGui::Text("Create your login: ");
-        ImGui::InputText(("max " + std::to_string(sizeof(buffer_user) / sizeof(char) - 1) + "##user").c_str(), buffer_user, sizeof(buffer_user));
-        ImGui::Text("Create your Password: ");
-        ImGui::InputText(("max " + std::to_string(sizeof(buffer_pass) / sizeof(char) - 1) + "##pass").c_str(), buffer_pass, sizeof(buffer_pass), !showPass ? ImGuiInputTextFlags_Password : 0);
-        ImGui::Checkbox("Show Password", &showPass);
-
-        if(ImGui::Button("Register "))
-        {   
-            client().Register(buffer_email, buffer_user, buffer_pass);
-            isRegisterationOpen = true;
-            isLogInOpen = false;
-        }
-
-        ImGui::SetCursorPos(ImVec2(8, ImGui::GetWindowHeight() - buttonGit.GetSize().y + 55));
-        if(ImGui::Button("back to log in window"))
-        {   
-            lastClosedWindowPos = ImGui::GetWindowPos();
-            ImGui::SetNextWindowPos(lastClosedWindowPos);
-            isLogInOpen = true;
-            isRegisterationOpen = false;
-        }
-        ImGui::End();
-    }
-
-    style = ImGuiStyle();
-
-    style.Colors[ImGuiCol_Button] = ImVec4(0.0f, 0.0f, 0.0f, 0.0f);  
-    style.Colors[ImGuiCol_ButtonHovered] = ImVec4(0.7f, 0.7f, 0.7f, 0.3f);   
-    style.Colors[ImGuiCol_ButtonActive] = ImVec4(0.7f, 0.7f, 0.7f, 0.5f);
-    style.Colors[ImGuiCol_TitleBgActive] = ImVec4(0.0f, 0.0f, 0.0f, 1.0f);
-    style.Colors[ImGuiCol_TitleBg] = ImVec4(0.0f, 0.0f, 0.0f, 1.0f);
-    if (isLobbiesOpen)
-    {
-        windowFlags = 0;
-        ImGui::Begin("Lobby selection", &isLobbiesOpen);
-
-        if (ImGui::Button("Create"))
-        {
-            client().CreateLobby("test1", "pass1", 1);
-        }
-
-        if (ImGui::Button("Refresh"))
-        {
-            FetchLobbies();
-        }
-
-        if (ImGui::BeginTable("Lobbies", 5, ImGuiTableFlags_Resizable))
-        {
-            ImGui::TableSetupColumn("Name");
-            ImGui::TableSetupColumn("White");
-            ImGui::TableSetupColumn("Black");
-            ImGui::TableSetupColumn("Spectators");
-            ImGui::TableSetupColumn("Actions");
-            ImGui::TableHeadersRow();
-
-            for (size_t row = 0; row < lobbies.size(); row++)
-            {
-                ImGui::TableNextRow();
-                for (int column = 0; column < 5; column++)
-                {
-                    ImGui::TableSetColumnIndex(column);
-                    switch (column)
-                    {
-                    case LobbyColumns::NAME:
-                        ImGui::Text(lobbies[row].name.c_str());
-                        break;
-                    case LobbyColumns::USER_1:
-                        ImGui::Text(std::to_string(lobbies[row].user_white_id.value_or(-1)).c_str());
-                        break;
-                    case LobbyColumns::USER_2:
-                        ImGui::Text(std::to_string(lobbies[row].user_black_id.value_or(-1)).c_str());
-                        break;
-                    case LobbyColumns::SPECTATORS:
-                        ImGui::Text("Todo");
-                        break;
-                    case LobbyColumns::ACTIONS:
-                        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.918f, 0.565f, 0.063f, 1.0f));
-                        ImGui::Button("Join");
-                        ImGui::PopStyleColor();
-                        ImGui::SameLine();
-                        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.165f, 0.165f, 0.447f, 1.0f));
-                        ImGui::Button("Spectate");
-                        ImGui::PopStyleColor();
-                        break;
-                    }
-                }
-            }
-            ImGui::EndTable();
-        }
-        ImGui::End();
-    }
-
-    style = ImGuiStyle();
     if (isLobbyMenuOpen)
     {
         ImGui::Begin("Lobby", &isLobbyMenuOpen);
@@ -258,8 +106,6 @@ void InterfaceLayer::OnImGuiRender()
         ImGui::End();
     }
 
-    style = ImGuiStyle();
-
     style.Colors[ImGuiCol_MenuBarBg] = ImVec4(0.1f, 0.1f, 0.1f, 1.0f);        // Dark gray menu bar background
     style.Colors[ImGuiCol_Header] = ImVec4(0.4f, 0.4f, 0.4f, 1.0f);
     style.Colors[ImGuiCol_HeaderHovered] = ImVec4(0.4f, 0.4f, 0.4f, 1.0f);    // Hovered color for menu items
@@ -268,13 +114,52 @@ void InterfaceLayer::OnImGuiRender()
     {
         if (ImGui::BeginMenu("System"))
         {
-            ImGui::MenuItem("Log In", nullptr, &isLogInOpen, !loginSuccessful);
-            ImGui::MenuItem("Lobby", nullptr, &isLobbiesOpen, loginSuccessful);
-            ImGui::MenuItem("Settings", nullptr, &isSettingsOpen, true);
+            ImGui::MenuItem("Authorization", nullptr, &authorizationWindow->isVisible, true);
+            ImGui::MenuItem("Lobby", nullptr, &lobbiesListWindow->isVisible, loginSuccessful);
+            ImGui::MenuItem("Settings", nullptr, &settingsWindow->isVisible, true);
             ImGui::EndMenu();
         }
         ImGui::EndMainMenuBar();
     }
+}
+
+void InterfaceLayer::OnLogin(const std::string& user, const std::string& password)
+{
+    client().LoginIn(user, password);
+}
+
+void InterfaceLayer::OnRegister(const std::string &email, const std::string &user, const std::string &password)
+{
+    client().Register(email, user, password);
+}
+
+void InterfaceLayer::OnLogout()
+{
+    isLobbyMenuOpen = false;
+    lobbiesListWindow->isVisible = false;
+    currentLobby = {};
+    loginSuccessful = false;
+    user = {};
+}
+
+void InterfaceLayer::OnLobbiesFetch()
+{   
+    client().FetchLobbies();
+}
+
+void InterfaceLayer::OnLobbyCreate(std::string &name, std::string &password, int id)
+{
+    client().CreateLobby(name, password, id);
+}
+
+void InterfaceLayer::OnLobbyJoin()
+{
+
+}
+
+void InterfaceLayer::OnLobbySpectate()
+{
+
 }
 
 void InterfaceLayer::HandleNetMessage(const net::Message<ChessMessage> &msg)
@@ -287,25 +172,18 @@ void InterfaceLayer::HandleNetMessage(const net::Message<ChessMessage> &msg)
         msgCopy >> this->user;
 
         loginSuccessful = true;
-        isLobbiesOpen = true;
-        isLogInOpen = false;
+        lobbiesListWindow->isVisible = true;
 
-        std::cout << "Login accepted" << std::endl;
+        authorizationWindow->SetAuthorizationSuccess();
+        authorizationWindow->isVisible = false;
 
-        FetchLobbies();
+        client().FetchLobbies();
         break;
     }
     case ChessMessage::LoginDenied:
     {
         loginSuccessful = false;
-        std::cout << "Login denied" << std::endl;
-        break;
-    }
-    case ChessMessage::LobbyGet:
-    {
-        std::cout << "Lobby get" << std::endl;
-        auto msgCopy = msg;
-        msgCopy >> this->lobbies;
+        authorizationWindow->SetAuthorizationError("Login denied");
         break;
     }
     case ChessMessage::LobbyJoined:
@@ -316,7 +194,7 @@ void InterfaceLayer::HandleNetMessage(const net::Message<ChessMessage> &msg)
         currentLobby = lobby;
         isLobbyMenuOpen = true;
         std::cout << "Lobby joined. " << lobby.name << ", " << lobby.password << std::endl;
-        FetchLobbies();
+        client().FetchLobbies();
         break;
     }
     case ChessMessage::LobbyJoinDenied:
@@ -331,7 +209,17 @@ void InterfaceLayer::HandleNetMessage(const net::Message<ChessMessage> &msg)
     {
         isLobbyMenuOpen = false;
         currentLobby = {};
-        FetchLobbies();
+        client().FetchLobbies();
+        break;
+    }
+    case ChessMessage::GameStarted:
+    {
+        std::cout << "Game Started";
+        break;
+    }
+    case ChessMessage::GameStartDenied:
+    {
+        std::cout << "Game Start Denied";
         break;
     }
     default: break;

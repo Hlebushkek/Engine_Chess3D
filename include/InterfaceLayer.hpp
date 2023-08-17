@@ -1,38 +1,47 @@
 #pragma once
 #include <Engine.hpp>
 #include "ChessNetEventDispatcher.hpp"
+#include "GUIAuthorizationWindow.hpp"
+#include "GUILobbiesListWindow.hpp"
 
-class InterfaceLayer : public Engine::Layer, public ChessNetMessageListener
+class GUISettingsWindow;
+
+class InterfaceLayer : public Engine::Layer, public ChessNetMessageListener,
+					   public GUIAuthorizationWindowDelegate, public GUILobbiesListWindowDelegate,
+					   public std::enable_shared_from_this<InterfaceLayer>
 {
 public:
 	InterfaceLayer();
 	virtual ~InterfaceLayer() = default;
 
-	void FetchLobbies();
+	void OnAttach() override;
+	void OnImGuiRender() override;
 
-	virtual void OnImGuiRender() override;
+	void HandleNetMessage(const net::Message<ChessMessage>& msg) override;
 
-	virtual void HandleNetMessage(const net::Message<ChessMessage>& msg) override;
+	//Authorization Delegate
+	void OnLogin(const std::string& user, const std::string& password) override;
+	void OnRegister(const std::string& email, const std::string& user, const std::string& password) override;
+	void OnLogout();
+	//Lobby Delegate
+	void OnLobbiesFetch() override;
+    void OnLobbyCreate(std::string& name, std::string& password, int id) override;
+    void OnLobbyJoin() override;
+    void OnLobbySpectate() override;
 
 private:
-	Engine::Button buttonGit;
+	std::vector<std::shared_ptr<Engine::GUIWindow>> windows;
+	std::shared_ptr<GUISettingsWindow> settingsWindow;
+	std::shared_ptr<GUIAuthorizationWindow> authorizationWindow;
+	std::shared_ptr<GUILobbiesListWindow> lobbiesListWindow;
+
+	Engine::GUIButton buttonGit;
+
 	bool loginSuccessful = false;
-	bool isSettingsOpen = true; 
-	bool isLogInOpen = true; 
-	bool isLobbiesOpen = false; 
 	bool isLobbyMenuOpen = false;
-	bool isRegisterationOpen = false;
 	bool isChecked1 = false;
-	bool showPass = false;
-	char buffer_user[32] = "";
-	char buffer_pass[32] = "";
-	char buffer_email[64] = "";
-	ImVec2 lastClosedWindowPos;
 
 	User user;
-
-	std::vector<Lobby> lobbies;
 	Lobby currentLobby;
-	enum LobbyColumns { NAME = 0, USER_1, USER_2, SPECTATORS, ACTIONS };
 
 };

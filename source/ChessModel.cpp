@@ -52,7 +52,7 @@ std::vector<std::pair<glm::ivec2, MoveType>> ChessModel::GetSelectionFor(ChessPi
 
             ChessPiece *otherPiece = GetPieceAt(testPosition);
             if (otherPiece && otherPiece->GetPlayer() != player)
-                result.emplace_back(std::make_pair(testPosition, MoveType::Capture));
+                result.emplace_back(testPosition, MoveType::Capture);
         }
     }
 
@@ -69,14 +69,14 @@ std::vector<std::pair<glm::ivec2, MoveType>> ChessModel::GetSelectionFor(ChessPi
 
             ChessPiece *otherPiece = GetPieceAt(testPosition);
             if (!otherPiece)
-                result.emplace_back(std::make_pair(testPosition, MoveType::Move));
+                result.emplace_back(testPosition, MoveType::Move);
             else if (otherPiece->GetPlayer() != player && !isMoveAttackSeparated)
             {
                 if (findEnemy)
                    break;
                 else
                 {
-                    result.emplace_back(std::make_pair(testPosition, MoveType::Capture));
+                    result.emplace_back(testPosition, MoveType::Capture);
                     findEnemy = true;
                 }
             }
