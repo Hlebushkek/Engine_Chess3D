@@ -13,7 +13,7 @@ Chess3D::Chess3D(const char* title, const int width, const int height)
 {
     client.connect("127.0.0.1", 60000);
 
-    ChessBoardLayer* boardLayer = new ChessBoardLayer();
+    auto boardLayer = std::make_shared<ChessBoardLayer>();
     PushLayer(boardLayer);
 
     ChessBoard *board = new ChessBoard();
@@ -33,8 +33,7 @@ Chess3D::Chess3D(const char* title, const int width, const int height)
     AddLight(new Engine::SpotLight(glm::vec3(0.71875f, 0.4f, -0.21875f)));
     // AddLight(new Engine::DirectionalLight(glm::vec3(0.f, -0.5f, -0.5f)));
 
-    InterfaceLayer* interfaceLayer = new InterfaceLayer();
-    PushLayer(interfaceLayer);
+    PushLayer(std::make_shared<InterfaceLayer>());
 }
 
 void Chess3D::Update()

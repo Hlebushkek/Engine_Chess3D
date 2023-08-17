@@ -25,7 +25,7 @@ ChessBoard::ChessBoard()
             {
                 ChessPieceObject *pieceObj = new ChessPieceObject(piece, glm::vec3(0.5 + x * 0.0625, 0.03125, -y * 0.0625), glm::vec3(0.f), glm::vec3(0.0625f));
                 pieceObj->parent = this;
-                pieces.emplace_back(pieceObj);
+                pieces.push_back(pieceObj);
             }
 }
 
