@@ -56,11 +56,15 @@ void GUILobbiesListWindow::InnerRender()
                     break;
                 case ACTIONS:
                     ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.918f, 0.565f, 0.063f, 1.0f));
-                    ImGui::Button("Join");
+                    if (ImGui::Button("Join"))
+                        if (auto sharedDelegate = delegate.lock())
+                            sharedDelegate->OnLobbyJoin(lobbies[row]);
                     ImGui::PopStyleColor();
                     ImGui::SameLine();
                     ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.165f, 0.165f, 0.447f, 1.0f));
-                    ImGui::Button("Spectate");
+                    if (ImGui::Button("Spectate"))
+                        if (auto sharedDelegate = delegate.lock())
+                            sharedDelegate->OnLobbySpectate(lobbies[row].id);
                     ImGui::PopStyleColor();
                     break;
                 }

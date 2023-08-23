@@ -118,7 +118,7 @@ bool ChessDataBaseOperations::LobbyCreate(Lobby &lobby)
     return false;
 }
 
-bool ChessDataBaseOperations::LobbyJoin(Lobby& lobby)
+bool ChessDataBaseOperations::LobbyJoin(int user_id, Lobby& lobby)
 {
     try
     {
@@ -149,16 +149,39 @@ bool ChessDataBaseOperations::LobbyJoin(Lobby& lobby)
                 lobby.user_white_id = temp;
             }
 
+            if (lobby.user_white_id == std::nullopt)
+                lobby.user_white_id = user_id;
+            else if (lobby.user_black_id == std::nullopt)
+                lobby.user_black_id = user_id;
+
             sql << "UPDATE lobby SET user_white_id = :user_white_id, user_black_id = :user_black_id WHERE id = :id",
-            soci::use(lobby.user_white_id.value(), "user_white_id"),
-            soci::use(lobby.user_black_id.value(), "user_black_id"),
-            soci::use(lobby.id, "id"),
-            soci::into(lobby);
+                soci::use(lobby.user_white_id.value(), "user_white_id"),
+                soci::use(lobby.user_black_id.value(), "user_black_id"),
+                soci::use(lobby.id, "id"),
+                soci::into(lobby);
 
             std::cout << "Joined successfully! Id=" << lobby.id << std::endl;
             return true;
         }
         else std::cout << "Lobby not found." << std::endl;
+    }
+    catch (const soci::soci_error& e)
+    {
+        std::cerr << "Error: " << e.what() << std::endl;
+    }
+
+    return false;
+}
+
+bool ChessDataBaseOperations::LobbyGet(Lobby &lobby)
+{
+    try
+    {
+        sql << "SELECT * FROM lobby WHERE id = :id",
+            soci::use(lobby.id, "id"),
+            soci::into(lobby);
+
+        return true;
     }
     catch (const soci::soci_error& e)
     {
@@ -186,27 +209,31 @@ std::vector<Lobby> ChessDataBaseOperations::FetchLobbies()
     return lobbies;
 }
 
-bool ChessDataBaseOperations::LobbyLeave(int user_id, int lobby_id)
+bool ChessDataBaseOperations::LobbyLeave(int user_id, Lobby& lobby)
 {
     try
     {
         Lobby fetchedLobby;
 
         sql << "SELECT * FROM lobby WHERE id = :id",
-            soci::use(lobby_id, "id"),
+            soci::use(lobby.id, "id"),
             soci::into(fetchedLobby);
-
-        if (fetchedLobby.user_white_id == std::nullopt || fetchedLobby.user_black_id == std::nullopt)
-            return LobbyDelete(lobby_id);
 
         if (fetchedLobby.user_white_id == user_id)
             sql << "UPDATE lobby SET user_white_id = NULL WHERE id = :id",
-                soci::use(lobby_id, "id"),
+                soci::use(lobby.id, "id"),
                 soci::into(fetchedLobby);
         else
             sql << "UPDATE lobby SET user_black_id = NULL WHERE id = :id",
-                soci::use(lobby_id, "id"),
+                soci::use(lobby.id, "id"),
                 soci::into(fetchedLobby);
+
+        sql << "SELECT * FROM lobby WHERE id = :id",
+            soci::use(lobby.id, "id"),
+            soci::into(lobby);
+
+        if (lobby.user_white_id == std::nullopt && lobby.user_black_id == std::nullopt)
+            return LobbyDelete(lobby.id);
 
         return true;
     }

@@ -18,8 +18,9 @@ void ChessBoardPieceObject::OnMouseDown(int button)
     if (!isHighlighted)
         return;
 
-    ChessBoard *board = (ChessBoard*)this->parent;
-    board->MovePieceTo(this);
+    if (auto parent = m_transform->GetParent().lock())
+        if (auto board = std::dynamic_pointer_cast<ChessBoard>(parent->gameObject().lock()))
+            board->RequestMovePiece(this);
 }
 
 void ChessBoardPieceObject::HighlightFor(MoveType type)

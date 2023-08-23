@@ -89,11 +89,16 @@ std::vector<std::pair<glm::ivec2, MoveType>> ChessModel::GetSelectionFor(ChessPi
 
 void ChessModel::MovePiece(glm::ivec2 from, glm::ivec2 to)
 {
-    if (boardState[to.y][to.x])
-        delete boardState[to.y][to.x];
+    MovePiece(from.x, from.y, to.x, to.y);
+}
 
-    boardState[to.y][to.x] = boardState[from.y][from.x];
-    boardState[from.y][from.x] = nullptr;
+void ChessModel::MovePiece(int fromX, int fromY, int toX, int toY)
+{
+    if (boardState[toY][toX])
+        delete boardState[toY][toX];
+
+    boardState[toY][toX] = boardState[fromY][fromX];
+    boardState[fromY][fromX] = nullptr;
 }
 
 ChessPiece *ChessModel::GetPieceAt(glm::ivec2 position)

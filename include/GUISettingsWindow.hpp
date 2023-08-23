@@ -5,7 +5,7 @@
 class GUISettingsWindow : public Engine::GUIWindow
 {
 public:
-    GUISettingsWindow() : GUIWindow("Settings") {}
+    GUISettingsWindow() : GUIWindow("Settings", false) {}
 
     void InnerRender() override;
 

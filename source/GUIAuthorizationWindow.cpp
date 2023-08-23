@@ -2,16 +2,19 @@
 
 GUIAuthorizationWindow::GUIAuthorizationWindow()
     : GUIWindow("Authorization", true, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize),
-      m_inputEmail("##email", 64), m_inputUser("##user", 32), m_inputPassword("##pass", 32)
+      m_errorText(), m_inputEmail("##email", 64), m_inputUser("##user", 32), m_inputPassword("##pass", 32)
 {
     m_inputEmail.SetTitle("max " + std::to_string(m_inputEmail.GetBufferSize() - 1) + m_inputUser.GetTitle());
     m_inputUser.SetTitle("max " + std::to_string(m_inputUser.GetBufferSize() - 1) + m_inputUser.GetTitle());
     m_inputPassword.SetTitle("max " + std::to_string(m_inputUser.GetBufferSize() - 1) + m_inputPassword.GetTitle());
     m_inputPassword.hideInput = true;
+    m_errorText.visible = false;
 }
 
 void GUIAuthorizationWindow::InnerRender()
 {
+    m_errorText.Render();
+
     if (m_state != AuthorizationState::Login)
     {
         ImGui::Text("Email: ");
@@ -71,18 +74,20 @@ void GUIAuthorizationWindow::PreRenderSetup()
 
 void GUIAuthorizationWindow::SetAuthorizationSuccess()
 {
+    m_errorText.visible = false;
     SetState(AuthorizationState::Authorized);
 }
 
 void GUIAuthorizationWindow::SetAuthorizationError(std::string errorMsg)
 {
-    std::cout << errorMsg << std::endl;
+    m_errorText.SetText(errorMsg);
+    m_errorText.visible = true;
 }
 
 void GUIAuthorizationWindow::SetState(AuthorizationState state)
 {
     m_state = state;
 
-    m_inputEmail.isVisible = m_state != AuthorizationState::Login;
+    m_inputEmail.visible = m_state != AuthorizationState::Login;
     m_inputEmail.readOnly = m_inputUser.readOnly = m_inputPassword.readOnly = m_state == AuthorizationState::Authorized;
 }

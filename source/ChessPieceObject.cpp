@@ -12,6 +12,7 @@ ChessPieceObject::ChessPieceObject(ChessPiece *pieceModel, glm::vec3 position, g
 
 void ChessPieceObject::OnMouseDown(int button)
 {
-    ChessBoard *board = (ChessBoard*)this->parent;
-    board->UpdateSelection(this);
+    if (auto parent = m_transform->GetParent().lock())
+        if (auto board = std::dynamic_pointer_cast<ChessBoard>(parent->gameObject().lock()))
+            board->UpdateSelection(this);
 }
