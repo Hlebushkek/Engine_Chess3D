@@ -5,28 +5,10 @@
 #include "ChessPieces.hpp"
 #include "Block.hpp"
 
-ChessBoard::ChessBoard()
+ChessBoard::ChessBoard() : GameObject()
 {
     textureWhite = Engine::Texture::LoadTexture("BlockB.png", GL_TEXTURE_2D);
     textureBlack = Engine::Texture::LoadTexture("Grass.png", GL_TEXTURE_2D);
-
-    for (int i = 0; i < 8; i++)
-        for (int j = 0; j < 8; j++)
-        {
-            Engine::Texture *pieceTexture = ((i % 8 + j) % 2) == 0 ? textureWhite : textureBlack;
-            ChessBoardPieceObject *piece = new ChessBoardPieceObject(pieceTexture, glm::vec3(0.5 + i * 0.0625, 0, j * -0.0625), glm::vec3(0.f), glm::vec3(0.0625f));
-            piece->parent = this;
-            boardBlocks[i][j] = piece;
-        }
-
-    for (int y = 0; y < 8; y++)
-        for (int x = 0; x < 8; x++)
-            if (ChessPiece *piece = model.GetPieceAt(x, y))
-            {
-                ChessPieceObject *pieceObj = new ChessPieceObject(piece, glm::vec3(0.5 + x * 0.0625, 0.03125, -y * 0.0625), glm::vec3(0.f), glm::vec3(0.0625f));
-                pieceObj->parent = this;
-                pieces.push_back(pieceObj);
-            }
 }
 
 void ChessBoard::UpdateSelection(ChessPieceObject *piece)
@@ -41,7 +23,7 @@ void ChessBoard::UpdateSelection(ChessPieceObject *piece)
 
     for (auto selection : selections)
     {
-        ChessBoardPieceObject *piece = static_cast<ChessBoardPieceObject*>(this->boardBlocks[selection.first.x][selection.first.y]);
+        auto piece = std::static_pointer_cast<ChessBoardPieceObject>(this->boardBlocks[selection.first.y][selection.first.x]);
         piece->HighlightFor(selection.second);
     }
 }
@@ -50,12 +32,27 @@ void ChessBoard::ResetSelection()
 {
     for (int y = 0; y < 8; y++)
         for (int x = 0; x < 8; x++)
-            static_cast<ChessBoardPieceObject*>(boardBlocks[y][x])->Reset();
+            std::static_pointer_cast<ChessBoardPieceObject>(boardBlocks[y][x])->Reset();
 
     selectedPiece = nullptr;
 }
 
-void ChessBoard::MovePieceTo(ChessBoardPieceObject *piece)
+void ChessBoard::MovePiece(const glm::ivec2 &from, const glm::vec2 &to)
+{
+    auto piece = GetPieceAt(from);
+    if (piece == nullptr)
+        return;
+
+    if (ChessPiece *capturedPiece = model.GetPieceAt(to))
+        RemovePiece(capturedPiece);
+
+    model.MovePiece(from, to);
+    piece->transform()->SetPosition(boardBlocks[to.y][to.x]->transform()->GetPosition() + glm::vec3(0.f, 0.03125f, 0.f));
+
+    ResetSelection();
+}
+
+void ChessBoard::RequestMovePiece(ChessBoardPieceObject *piece)
 {
     if (selectedPiece == nullptr)
         return;
@@ -64,22 +61,15 @@ void ChessBoard::MovePieceTo(ChessBoardPieceObject *piece)
     glm::ivec2 to = GetPositionFor(piece);
 
     if (from.x != INT_MAX && to.x != INT_MAX)
-    {
-        if (ChessPiece *capturedPiece = model.GetPieceAt(to))
-            RemovePiece(capturedPiece);
-
-        model.MovePiece(from, to);
-        selectedPiece->transform().SetPosition(piece->transform().GetPosition() + glm::vec3(0.f, 0.03125f, 0.f));
-
-        ResetSelection();
-    }
+        if (delegate.lock())
+            delegate.lock()->DidRequestMovePiece(from, to, selectedPiece->GetModel()->GetPlayer());
 }
 
 void ChessBoard::RemovePiece(ChessPiece *piece)
 {
     for (auto it = pieces.begin(); it != pieces.end(); it++)
     {
-        ChessPieceObject* pieceObj = static_cast<ChessPieceObject*>(*it);
+        auto pieceObj = std::static_pointer_cast<ChessPieceObject>(*it);
         if (pieceObj->GetModel() == piece)
         {
             pieces.erase(it);
@@ -88,26 +78,59 @@ void ChessBoard::RemovePiece(ChessPiece *piece)
     }
 }
 
+void ChessBoard::Reset()
+{
+    for (auto obj : pieces)
+        obj->transform()->UnassignParent();
+    pieces.clear();
+
+    model = ChessModel();
+    for (int y = 0; y < 8; y++)
+        for (int x = 0; x < 8; x++)
+            if (ChessPiece *piece = model.GetPieceAt(x, y))
+            {
+                auto pieceObj = Engine::GameObject::Instantiate<ChessPieceObject>(piece, glm::vec3(0.5 + x * 0.0625, 0.03125, y * -0.0625), glm::vec3(0.f), glm::vec3(0.0625f));
+                pieceObj->transform()->SetParent(m_transform);
+                pieces.push_back(pieceObj);
+            }
+}
+
+void ChessBoard::Initialize(std::shared_ptr<GameObject> object)
+{
+    GameObject::Initialize(object);
+
+    for (int y = 0; y < 8; y++)
+        for (int x = 0; x < 8; x++)
+        {
+            Engine::Texture *pieceTexture = ((x % 8 + y) % 2) == 0 ? textureWhite : textureBlack;
+            auto piece = Engine::GameObject::Instantiate<ChessBoardPieceObject>(pieceTexture, glm::vec3(0.5 + x * 0.0625, 0, y * -0.0625), glm::vec3(0.f), glm::vec3(0.0625f));
+            piece->transform()->SetParent(m_transform);
+            boardBlocks[y][x] = piece;
+        }
+}
+
+std::shared_ptr<ChessPieceObject> ChessBoard::GetPieceAt(const glm::ivec2 &position)
+{
+    auto pieceModel = model.GetPieceAt(position);
+
+    for (auto obj : pieces)
+    {
+        auto pieceObj = std::static_pointer_cast<ChessPieceObject>(obj);
+        if (pieceObj->GetModel() == pieceModel)
+            return pieceObj;
+    }
+
+    return nullptr;
+}
+
 glm::ivec2 ChessBoard::GetPositionFor(ChessBoardPieceObject *piece)
 {
     for (int y = 0; y < 8; y++)
         for (int x = 0; x < 8; x++)
-            if (boardBlocks[y][x] == piece)
-                return glm::vec2(y, x);
+            if (boardBlocks[y][x].get() == piece)
+                return glm::vec2(x, y);
 
     return glm::vec2(INT_MAX);
-}
-
-void ChessBoard::Render(Engine::Shader *shader)
-{
-    GameObject::Render(shader);
-
-    for (const auto& row : boardBlocks)
-        for (auto obj : row)
-            obj->Render(shader);
-
-    for (auto obj : pieces)
-        obj->Render(shader);
 }
 
 std::optional<Engine::Intersection> ChessBoard::CollidesWith(const Ray &ray)

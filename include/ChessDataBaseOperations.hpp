@@ -17,10 +17,10 @@ public:
     std::vector<User> FetchUsers();
 
     bool LobbyCreate(Lobby& lobby);
-    bool LobbyJoin(Lobby& lobby);
+    bool LobbyJoin(int user_id, Lobby& lobby);
     bool LobbyGet(Lobby& lobby);
     std::vector<Lobby> FetchLobbies();
-    bool LobbyLeave(int user_id, int lobby_id);
+    bool LobbyLeave(int user_id, Lobby& lobby);
     bool LobbyDelete(int id);
 
     void executeSQLScript(std::string filename);

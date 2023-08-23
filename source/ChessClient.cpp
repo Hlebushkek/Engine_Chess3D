@@ -51,13 +51,16 @@ void ChessClient::JoinLobby(int user_id, Lobby& lobby)
 {
     net::Message<ChessMessage> msg;
     msg.header.id = ChessMessage::LobbyJoin;
+    msg << user_id << lobby;
 
-    if (lobby.user_white_id == std::nullopt)
-        lobby.user_white_id = user_id;
-    else if (lobby.user_black_id == std::nullopt)
-        lobby.user_black_id = user_id;
+    this->send(msg);
+}
 
-    msg << lobby;
+void ChessClient::SpectateLobby(int user_id, int lobby_id)
+{
+    net::Message<ChessMessage> msg;
+    msg.header.id = ChessMessage::LobbySpectate;
+    msg << user_id << lobby_id;
 
     this->send(msg);
 }
@@ -70,12 +73,12 @@ void ChessClient::FetchLobbies()
     this->send(msg);
 }
 
-void ChessClient::LeaveLobby(int user_id, int lobby_id)
+void ChessClient::LeaveLobby(int user_id, Lobby& lobby)
 {
     net::Message<ChessMessage> msg;
     msg.header.id = ChessMessage::LobbyLeave;
 
-    msg << user_id << lobby_id;
+    msg << user_id << lobby;
 
     this->send(msg);
 }
@@ -86,6 +89,26 @@ void ChessClient::StartGame(int lobby_id)
     msg.header.id = ChessMessage::GameStart;
 
     msg << lobby_id;
+
+    this->send(msg);
+}
+
+void ChessClient::LeaveGame(int user_id, int lobby_id)
+{
+    net::Message<ChessMessage> msg;
+    msg.header.id = ChessMessage::GameLeave;
+
+    msg << user_id << lobby_id;
+
+    this->send(msg);
+}
+
+void ChessClient::MovePiece(int fromX, int fromY, int toX, int toY, int user_id, int lobby_id)
+{
+    net::Message<ChessMessage> msg;
+    msg.header.id = ChessMessage::Move;
+
+    msg << fromX << fromY << toX << toY << user_id << lobby_id;
 
     this->send(msg);
 }

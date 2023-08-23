@@ -38,16 +38,16 @@ include_directories(
 
 add_subdirectory(externals/soci)
 
-file(GLOB NET_SOURCES "external/net/*.hpp" "include/NetworkTypes.hpp")
+file(GLOB NET_SOURCES "external/net/*.hpp")
 
 file(GLOB SERVER_SOURCES
     "source/ChessServer.cpp" "include/ChessServer.hpp"
     "source/ChessDataBaseOperations.cpp" "include/ChessDataBaseOperations.hpp"
-    "source/ChessGameOnline.cpp" "include/ChessGameOnline.hpp" "include/ChessGameInterface.hpp"
+    "source/ChessSessionServer.cpp" "include/ChessSessionServer.hpp" "include/ChessSessionServer.hpp"
 )
 
-file(GLOB SOURCES "source/*.cpp" "include/*.hpp")
-list(REMOVE_ITEM SOURCES ${SERVER_SOURCES})
+file(GLOB APP_SOURCES "source/*.cpp" "include/*.hpp")
+list(REMOVE_ITEM APP_SOURCES ${SERVER_SOURCES})
 
 link_directories(
     ${PROJECT_SOURCE_DIR}/build/GameEngine/
@@ -55,7 +55,7 @@ link_directories(
     ${PROJECT_SOURCE_DIR}/build/GameEngine/vendors/SDL_image/
 )
 
-add_executable(${PROJECT_NAME} ${SOURCES} ${NET_SOURCES})
+add_executable(${PROJECT_NAME} ${APP_SOURCES} ${NET_SOURCES})
 add_executable(${PROJECT_NAME}_SERVER ${SERVER_SOURCES} ${NET_SOURCES})
 
 target_link_libraries(${PROJECT_NAME} Engine)

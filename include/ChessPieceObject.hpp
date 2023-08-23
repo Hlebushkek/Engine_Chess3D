@@ -13,7 +13,6 @@ public:
 
     virtual void OnMouseDown(int button) override;
 
-    GameObject *parent;
 private:
     ChessPiece *pieceModel;
 };

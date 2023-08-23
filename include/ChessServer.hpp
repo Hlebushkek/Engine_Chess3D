@@ -2,8 +2,9 @@
 
 #include <net/NetServer.hpp>
 #include "ChessDataBaseOperations.hpp"
-#include "ChessGameOnline.hpp"
 #include "NetworkTypes.hpp"
+
+class ChessSessionServer;
 
 class ChessServer : public net::ServerInterface<ChessMessage>
 {
@@ -16,8 +17,8 @@ protected:
     virtual void onMessage(std::shared_ptr<net::Connection<ChessMessage>> client, net::Message<ChessMessage>& msg);
 
 private:
-    std::vector<std::shared_ptr<ChessGameOnline>> activeGames;
-    std::unordered_map<int, std::shared_ptr<net::Connection<ChessMessage>>> userToConnection;
+    std::unordered_map<int, std::shared_ptr<ChessSessionServer>> activeGames;
+    std::unordered_map<int, std::shared_ptr<net::Connection<ChessMessage>>> userConnections;
 
 private:
     ChessDataBaseOperations *db = nullptr;

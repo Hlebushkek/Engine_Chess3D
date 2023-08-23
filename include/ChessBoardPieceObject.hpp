@@ -13,8 +13,6 @@ public:
     void HighlightFor(MoveType type);
     void Reset();
 
-    GameObject *parent;
-
 private:
     bool isHighlighted;
 

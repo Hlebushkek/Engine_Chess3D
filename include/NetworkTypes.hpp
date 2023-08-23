@@ -18,14 +18,19 @@ enum class ChessMessage : uint32_t
     LobbyJoin,
     LobbyJoined,
     LobbyJoinDenied,
+    LobbySpectate,
     LobbyLeave,
     LobbyGet,
     LobbiesGet,
+    LobbyUpdated,
     GameStart,
     GameStarted,
     GameStartDenied,
+    GameLeave,
     GameEnd,
     Move,
+    Moved,
+    MoveDenied
 };
 
 struct User
@@ -45,7 +50,7 @@ struct Lobby
     std::string password;
 };
 
-struct Watcher
+struct Spectator
 {
     int id;
     int user_id;

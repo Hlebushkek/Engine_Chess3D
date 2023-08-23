@@ -14,9 +14,13 @@ public:
 
     void CreateLobby(std::string name, std::string password, int user_id);
     void JoinLobby(int user_id, Lobby& lobby);
+    void SpectateLobby(int user_id, int lobby_id);
     void FetchLobbies();
-    void LeaveLobby(int user_id, int lobby_id);
+    void LeaveLobby(int user_id, Lobby& lobby);
     void StartGame(int lobby_id);
+    void LeaveGame(int user_id, int lobby_id);
+
+    void MovePiece(int fromX, int fromY, int toX, int toY, int user_id, int lobby_id);
 
 private:
 
