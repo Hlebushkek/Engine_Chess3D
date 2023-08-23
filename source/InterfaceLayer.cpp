@@ -38,13 +38,14 @@ void OpenURLMac(const char* url)
 }
 #endif
 
-ChessClient& client() { return (static_cast<Chess3D*>(Chess3D::Get()))->GetClient(); }
+std::shared_ptr<ChessClient> client() { return (static_cast<Chess3D*>(Chess3D::Get()))->GetClient(); }
 
 InterfaceLayer::InterfaceLayer()
-    : Engine::Layer("InterfaceLayer"), buttonGit("##gitButton", ImVec2(9, 10), ImVec2(90, 90), "../resources/github_icon.png")
+    : Engine::Layer("InterfaceLayer"), buttonGit("##gitButton", ImVec2(90, 90), "../resources/github_icon.png")
 {
     (static_cast<Chess3D*>(Chess3D::Get()))->GetNetMessageDispatcher().AddListener(this);
 
+    buttonGit.SetCustomPosition(ImVec2(9, 10));
     buttonGit.SetOnClick([]() {
         const char* url = "https://github.com/Hlebushkek/Engine_Chess3D";
         #ifdef _WIN32
@@ -57,19 +58,19 @@ InterfaceLayer::InterfaceLayer()
     settingsWindow = std::make_shared<GUISettingsWindow>();
     authorizationWindow = std::make_shared<GUIAuthorizationWindow>();
     lobbiesListWindow = std::make_shared<GUILobbiesListWindow>();
+    lobbyWindow = std::make_shared<GUILobbyWindow>();
     this->windows.push_back(settingsWindow);
     this->windows.push_back(authorizationWindow);
     this->windows.push_back(lobbiesListWindow);
+    this->windows.push_back(lobbyWindow);
 }
 
 void InterfaceLayer::OnAttach()
 {
     authorizationWindow->delegate = weak_from_this();
     lobbiesListWindow->delegate = weak_from_this();
-}
+    lobbyWindow->delegate = weak_from_this();
 
-void InterfaceLayer::OnImGuiRender()
-{
     ImGui::SetCurrentContext(Engine::ImGuiLayer::GetImguiContext());
 
     ImGuiStyle& style = ImGui::GetStyle();
@@ -80,6 +81,15 @@ void InterfaceLayer::OnImGuiRender()
     style.Colors[ImGuiCol_FrameBg] = ImVec4(0.7f, 0.7f, 0.7f, 0.3f);
     style.Colors[ImGuiCol_TitleBgActive] = ImVec4(0.0f, 0.0f, 0.0f, 1.0f);
     style.Colors[ImGuiCol_TitleBg] = ImVec4(0.0f, 0.0f, 0.0f, 1.0f);
+    style.Colors[ImGuiCol_MenuBarBg] = ImVec4(0.1f, 0.1f, 0.1f, 1.0f);
+    style.Colors[ImGuiCol_Header] = ImVec4(0.4f, 0.4f, 0.4f, 1.0f);
+    style.Colors[ImGuiCol_HeaderHovered] = ImVec4(0.4f, 0.4f, 0.4f, 1.0f);
+    style.Colors[ImGuiCol_HeaderActive] = ImVec4(0.4f, 0.4f, 0.4f, 1.0f);
+}
+
+void InterfaceLayer::OnImGuiRender()
+{
+    ImGui::SetCurrentContext(Engine::ImGuiLayer::GetImguiContext());
 
     for (auto window : windows)
         window->Render();
@@ -92,32 +102,14 @@ void InterfaceLayer::OnImGuiRender()
         buttonGit.Render();
     }
     ImGui::End();
-
-    if (isLobbyMenuOpen)
-    {
-        ImGui::Begin("Lobby", &isLobbyMenuOpen);
-        ImGui::Text("Name: %s", currentLobby.name.c_str());
-        ImGui::Text("user_white_id: %d", currentLobby.user_white_id.value_or(-1));
-        ImGui::Text("user_black_id: %d", currentLobby.user_black_id.value_or(-1));
-        if (ImGui::Button("Leave"))
-            client().LeaveLobby(user.id, currentLobby.id);
-        ImGui::SameLine();
-        if (ImGui::Button("Start"))
-            client().StartGame(currentLobby.id);
-        ImGui::End();
-    }
-
-    style.Colors[ImGuiCol_MenuBarBg] = ImVec4(0.1f, 0.1f, 0.1f, 1.0f);        // Dark gray menu bar background
-    style.Colors[ImGuiCol_Header] = ImVec4(0.4f, 0.4f, 0.4f, 1.0f);
-    style.Colors[ImGuiCol_HeaderHovered] = ImVec4(0.4f, 0.4f, 0.4f, 1.0f);    // Hovered color for menu items
-    style.Colors[ImGuiCol_HeaderActive] = ImVec4(0.4f, 0.4f, 0.4f, 1.0f);     // Active (pressed) color for menu items  
+ 
     if (ImGui::BeginMainMenuBar()) 
     {
         if (ImGui::BeginMenu("System"))
         {
-            ImGui::MenuItem("Authorization", nullptr, &authorizationWindow->isVisible, true);
-            ImGui::MenuItem("Lobby", nullptr, &lobbiesListWindow->isVisible, loginSuccessful);
-            ImGui::MenuItem("Settings", nullptr, &settingsWindow->isVisible, true);
+            ImGui::MenuItem("Authorization", nullptr, &authorizationWindow->visible, true);
+            ImGui::MenuItem("Lobby", nullptr, &lobbiesListWindow->visible, loginSuccessful && !gameInProgress);
+            ImGui::MenuItem("Settings", nullptr, &settingsWindow->visible, true);
             ImGui::EndMenu();
         }
         ImGui::EndMainMenuBar();
@@ -126,18 +118,18 @@ void InterfaceLayer::OnImGuiRender()
 
 void InterfaceLayer::OnLogin(const std::string& user, const std::string& password)
 {
-    client().LoginIn(user, password);
+    client()->LoginIn(user, password);
 }
 
 void InterfaceLayer::OnRegister(const std::string &email, const std::string &user, const std::string &password)
 {
-    client().Register(email, user, password);
+    client()->Register(email, user, password);
 }
 
 void InterfaceLayer::OnLogout()
 {
-    isLobbyMenuOpen = false;
-    lobbiesListWindow->isVisible = false;
+    lobbyWindow->visible = false;
+    lobbiesListWindow->visible = false;
     currentLobby = {};
     loginSuccessful = false;
     user = {};
@@ -145,22 +137,32 @@ void InterfaceLayer::OnLogout()
 
 void InterfaceLayer::OnLobbiesFetch()
 {   
-    client().FetchLobbies();
+    client()->FetchLobbies();
 }
 
 void InterfaceLayer::OnLobbyCreate(std::string &name, std::string &password, int id)
 {
-    client().CreateLobby(name, password, id);
+    client()->CreateLobby(name, password, id);
 }
 
-void InterfaceLayer::OnLobbyJoin()
+void InterfaceLayer::OnLobbyJoin(Lobby& lobby)
 {
-
+    client()->JoinLobby(user.id, lobby);
 }
 
-void InterfaceLayer::OnLobbySpectate()
+void InterfaceLayer::OnLobbySpectate(int lobby_id)
 {
+    client()->SpectateLobby(lobby_id, currentLobby.id);
+}
 
+void InterfaceLayer::OnGameStart()
+{
+    client()->StartGame(currentLobby.id);
+}
+
+void InterfaceLayer::OnLeave()
+{
+    client()->LeaveLobby(user.id, currentLobby);
 }
 
 void InterfaceLayer::HandleNetMessage(const net::Message<ChessMessage> &msg)
@@ -173,29 +175,31 @@ void InterfaceLayer::HandleNetMessage(const net::Message<ChessMessage> &msg)
         msgCopy >> this->user;
 
         loginSuccessful = true;
-        lobbiesListWindow->isVisible = true;
+        lobbiesListWindow->visible = true;
 
         authorizationWindow->SetAuthorizationSuccess();
-        authorizationWindow->isVisible = false;
+        authorizationWindow->visible = false;
 
-        client().FetchLobbies();
+        client()->FetchLobbies();
         break;
     }
     case ChessMessage::LoginDenied:
     {
+        auto msgCopy = msg;
+        std::string response;
+        msgCopy >> response;
         loginSuccessful = false;
-        authorizationWindow->SetAuthorizationError("Login denied");
+        authorizationWindow->SetAuthorizationError(response);
         break;
     }
     case ChessMessage::LobbyJoined:
     {
         auto msgCopy = msg;
-        Lobby lobby;
-        msgCopy >> lobby;
-        currentLobby = lobby;
-        isLobbyMenuOpen = true;
-        std::cout << "Lobby joined. " << lobby.name << ", " << lobby.password << std::endl;
-        client().FetchLobbies();
+        msgCopy >> currentLobby;
+        lobbyWindow->UpdateLobby(currentLobby);
+        lobbyWindow->visible = true;
+        std::cout << "Lobby joined. " << currentLobby.name << ", " << currentLobby.password << std::endl;
+        client()->FetchLobbies();
         break;
     }
     case ChessMessage::LobbyJoinDenied:
@@ -208,19 +212,28 @@ void InterfaceLayer::HandleNetMessage(const net::Message<ChessMessage> &msg)
     }
     case ChessMessage::LobbyLeave:
     {
-        isLobbyMenuOpen = false;
+        lobbyWindow->visible = false;
         currentLobby = {};
-        client().FetchLobbies();
+        client()->FetchLobbies();
+        break;
+    }
+    case ChessMessage::LobbyUpdated:
+    {
+        auto msgCopy = msg;
+        msgCopy >> currentLobby;
+        lobbyWindow->UpdateLobby(currentLobby);
         break;
     }
     case ChessMessage::GameStarted:
     {
-        std::cout << "Game Started";
+        gameInProgress = true;
+        lobbyWindow->visible = false;
+        lobbiesListWindow->visible = false;
         break;
     }
     case ChessMessage::GameStartDenied:
     {
-        std::cout << "Game Start Denied";
+        std::cout << "Game Start Denied\n";
         break;
     }
     default: break;

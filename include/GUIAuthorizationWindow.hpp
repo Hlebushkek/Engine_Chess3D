@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Engine.hpp>
+#include "GUIErrorText.hpp"
 
 class GUIAuthorizationWindowDelegate
 {
@@ -33,6 +34,7 @@ private:
     void SetState(AuthorizationState state);
 
 private:
+    GUIErrorText m_errorText;
     Engine::GUIInputText m_inputEmail;
     Engine::GUIInputText m_inputUser;
     Engine::GUIInputText m_inputPassword;
