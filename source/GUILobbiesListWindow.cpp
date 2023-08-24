@@ -15,7 +15,7 @@ void GUILobbiesListWindow::InnerRender()
         {
             std::string lobbyName = "test1";
             std::string lobbyPass = "pass1";
-            sharedDelegate->OnLobbyCreate(lobbyName, lobbyPass, 1);
+            sharedDelegate->OnLobbyCreate(lobbyName, lobbyPass);
         }
     }
 

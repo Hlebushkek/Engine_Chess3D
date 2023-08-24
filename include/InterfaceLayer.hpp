@@ -26,7 +26,7 @@ public:
 	void OnLogout();
 	//LobbiesList Delegate
 	void OnLobbiesFetch() override;
-    void OnLobbyCreate(std::string& name, std::string& password, int id) override;
+    void OnLobbyCreate(std::string& name, std::string& password) override;
     void OnLobbyJoin(Lobby& lobby) override;
     void OnLobbySpectate(int lobby_id) override;
 	//Lobby Delegate

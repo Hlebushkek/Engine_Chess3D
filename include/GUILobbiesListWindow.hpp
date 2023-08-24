@@ -7,7 +7,7 @@ class GUILobbiesListWindowDelegate
 {
 public:
     virtual void OnLobbiesFetch() = 0;
-    virtual void OnLobbyCreate(std::string& name, std::string& password, int id) = 0;
+    virtual void OnLobbyCreate(std::string& name, std::string& password) = 0;
     virtual void OnLobbyJoin(Lobby& lobby) = 0;
     virtual void OnLobbySpectate(int lobby_id) = 0;
 };

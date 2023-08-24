@@ -2,9 +2,9 @@
 
 GUIAuthorizationWindow::GUIAuthorizationWindow()
     : GUIWindow("Authorization", true, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize),
-      m_errorText(), m_inputEmail("##email", 64), m_inputUser("##user", 32), m_inputPassword("##pass", 32)
+      m_errorText(), m_inputEmail("##email", 32), m_inputUser("##user", 32), m_inputPassword("##pass", 32)
 {
-    m_inputEmail.SetTitle("max " + std::to_string(m_inputEmail.GetBufferSize() - 1) + m_inputUser.GetTitle());
+    m_inputEmail.SetTitle("max " + std::to_string(m_inputEmail.GetBufferSize() - 1) + m_inputEmail.GetTitle());
     m_inputUser.SetTitle("max " + std::to_string(m_inputUser.GetBufferSize() - 1) + m_inputUser.GetTitle());
     m_inputPassword.SetTitle("max " + std::to_string(m_inputUser.GetBufferSize() - 1) + m_inputPassword.GetTitle());
     m_inputPassword.hideInput = true;

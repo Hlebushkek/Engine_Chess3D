@@ -140,9 +140,9 @@ void InterfaceLayer::OnLobbiesFetch()
     client()->FetchLobbies();
 }
 
-void InterfaceLayer::OnLobbyCreate(std::string &name, std::string &password, int id)
+void InterfaceLayer::OnLobbyCreate(std::string &name, std::string &password)
 {
-    client()->CreateLobby(name, password, id);
+    client()->CreateLobby(name, password, user.id);
 }
 
 void InterfaceLayer::OnLobbyJoin(Lobby& lobby)
