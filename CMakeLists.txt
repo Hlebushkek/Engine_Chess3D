@@ -65,10 +65,11 @@ endif()
 
 if(Boost_FOUND)
     target_link_libraries(${PROJECT_NAME} ${Boost_LIBRARIES})
-    target_link_libraries(${PROJECT_NAME} wsock32 ws2_32)
-
     target_link_libraries(${PROJECT_NAME}_SERVER ${Boost_LIBRARIES})
-    target_link_libraries(${PROJECT_NAME}_SERVER wsock32 ws2_32)
+    if(WIN32)
+        target_link_libraries(${PROJECT_NAME} wsock32 ws2_32)
+        target_link_libraries(${PROJECT_NAME}_SERVER wsock32 ws2_32)
+    endif()
 endif()
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/externals/soci/cmake/modules)
