@@ -2,7 +2,9 @@
 
 #include <iostream>
 #include <string>
+#ifdef _WIN32
 #include <winsock2.h>
+#endif
 #include <soci/soci.h>
 #include <soci/mysql/soci-mysql.h>
 #include "NetworkTypes.hpp"

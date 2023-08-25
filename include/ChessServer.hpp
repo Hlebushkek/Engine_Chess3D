@@ -1,5 +1,6 @@
 #pragma once
 
+#include <unordered_map>
 #include <net/NetServer.hpp>
 #include "ChessDataBaseOperations.hpp"
 #include "NetworkTypes.hpp"

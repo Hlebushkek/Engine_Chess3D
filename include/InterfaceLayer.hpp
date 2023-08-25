@@ -23,7 +23,7 @@ public:
 	//Authorization Delegate
 	void OnLogin(const std::string& user, const std::string& password) override;
 	void OnRegister(const std::string& email, const std::string& user, const std::string& password) override;
-	void OnLogout();
+	void OnLogout() override;
 	//LobbiesList Delegate
 	void OnLobbiesFetch() override;
     void OnLobbyCreate(std::string& name, std::string& password) override;
