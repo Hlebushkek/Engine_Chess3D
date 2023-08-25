@@ -48,11 +48,11 @@ std::vector<std::pair<glm::ivec2, MoveType>> ChessModel::GetSelectionFor(ChessPi
         {
             glm::ivec2 testPosition = glm::ivec2(position + offset);
             if (!PositionExists(testPosition))
-                continue;
+                break;
 
-            ChessPiece *otherPiece = GetPieceAt(testPosition);
-            if (otherPiece && otherPiece->GetPlayer() != player)
-                result.emplace_back(testPosition, MoveType::Capture);
+            if (ChessPiece *otherPiece = GetPieceAt(testPosition))
+                if (otherPiece->GetPlayer() != player)
+                    result.emplace_back(testPosition, MoveType::Capture);
         }
     }
 
@@ -60,27 +60,20 @@ std::vector<std::pair<glm::ivec2, MoveType>> ChessModel::GetSelectionFor(ChessPi
     auto availableOffsets = piece->GetMoveOffsets();
     for (const auto& offsetsLine : availableOffsets)
     {
-        bool findEnemy = false;
         for (const auto& offset : offsetsLine)
         {
             glm::ivec2 testPosition = glm::ivec2(position + offset);
             if (!PositionExists(testPosition))
-                continue;
+                break;
 
-            ChessPiece *otherPiece = GetPieceAt(testPosition);
-            if (!otherPiece)
-                result.emplace_back(testPosition, MoveType::Move);
-            else if (otherPiece->GetPlayer() != player && !isMoveAttackSeparated)
+            if (ChessPiece *otherPiece = GetPieceAt(testPosition))
             {
-                if (findEnemy)
-                   break;
-                else
-                {
+                if (otherPiece->GetPlayer() != player && !isMoveAttackSeparated)
                     result.emplace_back(testPosition, MoveType::Capture);
-                    findEnemy = true;
-                }
+
+                break;
             }
-            else break;
+            else { result.emplace_back(testPosition, MoveType::Move); }
         }
     }
 
@@ -99,6 +92,9 @@ void ChessModel::MovePiece(int fromX, int fromY, int toX, int toY)
 
     boardState[toY][toX] = boardState[fromY][fromX];
     boardState[fromY][fromX] = nullptr;
+
+    if (auto pawn = static_cast<Pawn*>(boardState[toY][toX]))
+        pawn->SetHasMoved();
 }
 
 ChessPiece *ChessModel::GetPieceAt(glm::ivec2 position)

@@ -46,9 +46,19 @@ public:
     {
         std::vector<std::vector<glm::vec2>> moveOffsets;
         if (this->m_player == PlayerType::White)
-            moveOffsets = { { {0, 1}, {0, 2} } };
+        {
+            if (m_hasMoved) 
+                moveOffsets = { { {0, 1} } };
+            else
+                moveOffsets = { { {0, 1}, {0, 2} } };
+        }
         else
-            moveOffsets = { { {0,-1}, {0,-2} } };
+        {
+            if (m_hasMoved) 
+                moveOffsets = { { {0,-1} } };
+            else
+                moveOffsets = { { {0,-1}, {0,-2} } };
+        }
 
         return moveOffsets;
     }
@@ -81,6 +91,12 @@ public:
     }
 
     std::string GetTextureName() const override { return "0"; }
+
+    void SetHasMoved() { m_hasMoved = true; }
+
+private:
+    bool m_hasMoved = false;
+
 };
 
 class Knight : public ChessPiece
