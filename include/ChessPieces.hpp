@@ -8,23 +8,32 @@
 class ChessPiece
 {
 public:
-    ChessPiece(PlayerType player) : _player(player) {}
+    ChessPiece(PlayerType player) : m_player(player) {}
     virtual ~ChessPiece() = default;
 
     virtual std::vector<std::vector<glm::vec2>> GetMoveOffsets() const = 0;
-    virtual std::vector<std::vector<glm::vec2>> GetAdditionalAttackOffsets() const { return {};}
+    virtual std::vector<std::vector<glm::vec2>> GetAdditionalAttackOffsets() const { return {}; }
     virtual bool IsMoveAttackSeparated() const { return true; }
     virtual bool CanCombine() const { return true; }
 
     virtual Engine::Mesh *GetMesh() const = 0;
-    virtual Engine::Texture *GetTexture() const = 0;
+    virtual std::string GetTextureName() const = 0;
+
+    Engine::Texture *GetTexture() const
+    {
+        return Engine::Texture::LoadTexture(
+            std::string(m_player == PlayerType::White ? whiteTexPrefix : blackTexPrefix).append(GetTextureName()).append(".bmp"), GL_TEXTURE_2D);
+    }
 
     static ChessPiece *CreatePiece(PieceType type, PlayerType player);
 
-    const PlayerType& GetPlayer() const { return _player; }
+    const PlayerType &GetPlayer() const { return m_player; }
 
 protected:
-    PlayerType _player;
+    PlayerType m_player;
+
+    const std::string whiteTexPrefix = "woodlig";
+    const std::string blackTexPrefix = "wooddar";
 
 };
 
@@ -36,7 +45,7 @@ public:
     std::vector<std::vector<glm::vec2>> GetMoveOffsets() const override
     {
         std::vector<std::vector<glm::vec2>> moveOffsets;
-        if (this->_player == PlayerType::White)
+        if (this->m_player == PlayerType::White)
             moveOffsets = { { {0, 1}, {0, 2} } };
         else
             moveOffsets = { { {0,-1}, {0,-2} } };
@@ -47,7 +56,7 @@ public:
     std::vector<std::vector<glm::vec2>> GetAdditionalAttackOffsets() const override
     {
         std::vector<std::vector<glm::vec2>> attackOffsets;
-        if (this->_player == PlayerType::White)
+        if (this->m_player == PlayerType::White)
             attackOffsets = { { {1, 1} }, { {-1, 1} } };
         else
             attackOffsets = { { {1,-1} }, { {-1,-1} } };
@@ -71,10 +80,7 @@ public:
         return new Engine::Mesh(vertices.data(), vertices.size(), nullptr, 0);
     }
 
-    Engine::Texture *GetTexture() const override
-    {
-        return Engine::Texture::LoadTexture("woodlig0.bmp", GL_TEXTURE_2D);
-    }
+    std::string GetTextureName() const override { return "0"; }
 };
 
 class Knight : public ChessPiece
@@ -96,10 +102,7 @@ public:
         return new Engine::Mesh(vertices.data(), vertices.size(), nullptr, 0);
     }
 
-    Engine::Texture *GetTexture() const override
-    {
-        return Engine::Texture::LoadTexture("woodlig2.bmp", GL_TEXTURE_2D);
-    }
+    std::string GetTextureName() const override { return "2"; }
 };
 
 class Bishop : public ChessPiece
@@ -132,10 +135,7 @@ public:
         return new Engine::Mesh(vertices.data(), vertices.size(), nullptr, 0);
     }
 
-    Engine::Texture *GetTexture() const override
-    {
-        return Engine::Texture::LoadTexture("woodlig3.bmp", GL_TEXTURE_2D);
-    }
+    std::string GetTextureName() const override { return "3"; }
 };
 
 class Rook : public ChessPiece
@@ -168,10 +168,7 @@ public:
         return new Engine::Mesh(vertices.data(), vertices.size(), nullptr, 0);
     }
 
-    Engine::Texture *GetTexture() const override
-    {
-        return Engine::Texture::LoadTexture("woodlig1.bmp", GL_TEXTURE_2D);
-    }
+    std::string GetTextureName() const override { return "1"; }
 };
 
 class Queen : public ChessPiece
@@ -212,10 +209,7 @@ public:
         return new Engine::Mesh(vertices.data(), vertices.size(), nullptr, 0);
     }
 
-    Engine::Texture *GetTexture() const override
-    {
-        return Engine::Texture::LoadTexture("woodlig4.bmp", GL_TEXTURE_2D);
-    }
+    std::string GetTextureName() const override { return "4"; }
 };
 
 class King : public ChessPiece
@@ -237,8 +231,5 @@ public:
         return new Engine::Mesh(vertices.data(), vertices.size(), nullptr, 0);
     }
 
-    Engine::Texture *GetTexture() const override
-    {
-        return Engine::Texture::LoadTexture("woodlig5.bmp", GL_TEXTURE_2D);
-    }
+    std::string GetTextureName() const override { return "5"; }
 };
