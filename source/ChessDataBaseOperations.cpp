@@ -2,6 +2,7 @@
 #include <fstream>
 #include <boost/algorithm/string.hpp>
 #include "ChessDataBaseOperations.hpp"
+#include "config.h"
 
 ChessDataBaseOperations::ChessDataBaseOperations(std::string schemeName, std::string login, std::string password)
     : sql(soci::mysql, "dbname=" + schemeName + " user=" + login + " password=" + password)
@@ -261,11 +262,12 @@ bool ChessDataBaseOperations::LobbyDelete(int id)
     return false;
 }
 
-void ChessDataBaseOperations::executeSQLScript(std::string filename)
+void ChessDataBaseOperations::executeSQLScript(const std::string& filename)
 {
     std::string result;
 
-    std::ifstream sqlFile("../resources/Database/" + filename);
+    std::string fullPath = RESOURCES_DIR + std::string("Database/") + filename;
+    std::ifstream sqlFile(fullPath);
     if (!sqlFile.is_open())
     {
         std::cerr << "Failed to open the SQL file." << std::endl;

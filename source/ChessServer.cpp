@@ -1,5 +1,6 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
+#include "config.h"
 #include "ChessServer.hpp"
 #include "ChessSessionServer.hpp"
 
@@ -19,8 +20,9 @@ int main()
 ChessServer::ChessServer(uint16_t nPort)
 	: net::ServerInterface<ChessMessage>(nPort)
 {
+    std::string configPath = RESOURCES_DIR + std::string("configs/passwords.json");
 	boost::property_tree::ptree pt;
-    boost::property_tree::read_json("../resources/configs/passwords.json", pt);
+    boost::property_tree::read_json(configPath, pt);
 
     std::string login = pt.get<std::string>("db_credentials.login");
     std::string password = pt.get<std::string>("db_credentials.password");

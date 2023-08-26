@@ -25,7 +25,7 @@ public:
     bool LobbyLeave(int user_id, Lobby& lobby);
     bool LobbyDelete(int id);
 
-    void executeSQLScript(std::string filename);
+    void executeSQLScript(const std::string& filename);
 
 private:
     soci::session sql;
