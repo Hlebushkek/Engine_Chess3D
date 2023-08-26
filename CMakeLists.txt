@@ -89,3 +89,11 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy
     $<TARGET_FILE:SDL3_image> ${CMAKE_BINARY_DIR}
 )
+
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy
+    $<TARGET_FILE:soci_core> ${CMAKE_BINARY_DIR}
+
+    COMMAND ${CMAKE_COMMAND} -E copy
+    $<TARGET_FILE:soci_mysql> ${CMAKE_BINARY_DIR}
+)
