@@ -86,7 +86,7 @@ public:
 
     Engine::Mesh *GetMesh() const override
     {
-        static std::vector<Engine::Vertex> vertices = Engine::OBJClass().loadOBJ("../resources/Pawn.obj");
+        static std::vector<Engine::Vertex> vertices = Engine::OBJClass().loadOBJ("Pawn.obj");
         return new Engine::Mesh(vertices.data(), vertices.size(), nullptr, 0);
     }
 
@@ -114,7 +114,7 @@ public:
 
     Engine::Mesh *GetMesh() const override
     {
-        static std::vector<Engine::Vertex> vertices = Engine::OBJClass().loadOBJ("../resources/Knight.obj");
+        static std::vector<Engine::Vertex> vertices = Engine::OBJClass().loadOBJ("Knight.obj");
         return new Engine::Mesh(vertices.data(), vertices.size(), nullptr, 0);
     }
 
@@ -147,7 +147,7 @@ public:
 
     Engine::Mesh *GetMesh() const override
     {
-        static std::vector<Engine::Vertex> vertices = Engine::OBJClass().loadOBJ("../resources/Bishop.obj");
+        static std::vector<Engine::Vertex> vertices = Engine::OBJClass().loadOBJ("Bishop.obj");
         return new Engine::Mesh(vertices.data(), vertices.size(), nullptr, 0);
     }
 
@@ -180,7 +180,7 @@ public:
 
     Engine::Mesh *GetMesh() const override
     {
-        static std::vector<Engine::Vertex> vertices = Engine::OBJClass().loadOBJ("../resources/Rook.obj");
+        static std::vector<Engine::Vertex> vertices = Engine::OBJClass().loadOBJ("Rook.obj");
         return new Engine::Mesh(vertices.data(), vertices.size(), nullptr, 0);
     }
 
@@ -221,7 +221,7 @@ public:
 
     Engine::Mesh *GetMesh() const override
     {
-        static std::vector<Engine::Vertex> vertices = Engine::OBJClass().loadOBJ("../resources/Queen.obj");
+        static std::vector<Engine::Vertex> vertices = Engine::OBJClass().loadOBJ("Queen.obj");
         return new Engine::Mesh(vertices.data(), vertices.size(), nullptr, 0);
     }
 
@@ -243,7 +243,7 @@ public:
 
     Engine::Mesh *GetMesh() const override
     {
-        static std::vector<Engine::Vertex> vertices = Engine::OBJClass().loadOBJ("../resources/King.obj");
+        static std::vector<Engine::Vertex> vertices = Engine::OBJClass().loadOBJ("King.obj");
         return new Engine::Mesh(vertices.data(), vertices.size(), nullptr, 0);
     }
 

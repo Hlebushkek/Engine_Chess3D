@@ -10,6 +10,9 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_BUILD_TYPE Debug)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
 
+set(RESOURCES_DIR "${CMAKE_SOURCE_DIR}/resources/")
+configure_file(${CMAKE_SOURCE_DIR}/config.h.in ${CMAKE_SOURCE_DIR}/GameEngine/include/config.h)
+
 if(APPLE)
     enable_language(OBJC)
     find_library(APPLICATIONSERVICES_FRAMEWORK ApplicationServices)
@@ -86,6 +89,7 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy
     $<TARGET_FILE:SDL3-shared> ${CMAKE_BINARY_DIR}
+
     COMMAND ${CMAKE_COMMAND} -E copy
     $<TARGET_FILE:SDL3_image> ${CMAKE_BINARY_DIR}
 )

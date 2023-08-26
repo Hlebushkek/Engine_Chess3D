@@ -41,7 +41,7 @@ void OpenURLMac(const char* url)
 std::shared_ptr<ChessClient> client() { return (static_cast<Chess3D*>(Chess3D::Get()))->GetClient(); }
 
 InterfaceLayer::InterfaceLayer()
-    : Engine::Layer("InterfaceLayer"), buttonGit("##gitButton", ImVec2(90, 90), "../resources/github_icon.png")
+    : Engine::Layer("InterfaceLayer"), buttonGit("##gitButton", ImVec2(90, 90), "github_icon.png")
 {
     (static_cast<Chess3D*>(Chess3D::Get()))->GetNetMessageDispatcher().AddListener(this);
 
