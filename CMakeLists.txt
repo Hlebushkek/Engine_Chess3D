@@ -12,7 +12,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
 
 set(RESOURCES_DIR "${CMAKE_SOURCE_DIR}/resources/")
 configure_file(${CMAKE_SOURCE_DIR}/config.h.in ${CMAKE_SOURCE_DIR}/GameEngine/include/config.h)
-configure_file(${CMAKE_SOURCE_DIR}/config.h.in ${CMAKE_SOURCE_DIR}/config.h)
+configure_file(${CMAKE_SOURCE_DIR}/config.h.in ${CMAKE_SOURCE_DIR}/include/config.h)
 
 if(APPLE)
     enable_language(OBJC)
@@ -59,8 +59,8 @@ link_directories(
     ${PROJECT_SOURCE_DIR}/build/GameEngine/vendors/SDL_image/
 )
 
-add_executable(${PROJECT_NAME} ${APP_SOURCES} ${NET_SOURCES} "config.h")
-add_executable(${PROJECT_NAME}_SERVER ${SERVER_SOURCES} ${NET_SOURCES} "config.h")
+add_executable(${PROJECT_NAME} ${APP_SOURCES} ${NET_SOURCES} "include/config.h")
+add_executable(${PROJECT_NAME}_SERVER ${SERVER_SOURCES} ${NET_SOURCES} "include/config.h")
 
 target_link_libraries(${PROJECT_NAME} Engine)
 if(APPLE)
