@@ -91,8 +91,6 @@ void InterfaceLayer::OnAttach()
 
 void InterfaceLayer::OnImGuiRender()
 {
-    ImGui::SetCurrentContext(Engine::Renderer::GetRenderingContext()->imguiContext);
-
     for (auto window : windows)
         window->Render();
     
