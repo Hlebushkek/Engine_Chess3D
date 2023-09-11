@@ -10,7 +10,7 @@ class ChessBoard;
 class ChessSessionOnline : public ChessSession, public ChessNetMessageListener
 {
 public:
-    ChessSessionOnline(std::shared_ptr<ChessClient> client, std::shared_ptr<ChessBoard> board, const Lobby& lobby, const User& user);
+    ChessSessionOnline(std::weak_ptr<ChessClient> client, std::weak_ptr<ChessBoard> board, const Lobby& lobby, const User& user);
     ~ChessSessionOnline();
 
     void Leave() override;
@@ -21,7 +21,7 @@ public:
     void HandleNetMessage(const net::Message<ChessMessage>& msg) override;
 
 private:
-    std::shared_ptr<ChessClient> m_client;
+    std::weak_ptr<ChessClient> m_client;
     PlayerType m_playerType;
     Lobby m_lobby;
     User m_user;

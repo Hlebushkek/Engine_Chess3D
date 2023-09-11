@@ -1,9 +1,11 @@
 #pragma once
 
 #include <vector>
+#include <string>
 #include <glm/glm.hpp>
 #include "ChessTypes.hpp"
-#include "Engine.hpp"
+
+namespace Engine { class Mesh; class Texture; }
 
 class ChessPiece
 {
@@ -16,18 +18,14 @@ public:
     virtual bool IsMoveAttackSeparated() const { return true; }
     virtual bool CanCombine() const { return true; }
 
-    virtual Engine::Mesh *GetMesh() const = 0;
+    virtual std::shared_ptr<Engine::Mesh> GetMesh() const = 0;
     virtual std::string GetTextureName() const = 0;
 
-    Engine::Texture *GetTexture() const
-    {
-        return Engine::Texture::LoadTexture(
-            std::string(m_player == PlayerType::White ? whiteTexPrefix : blackTexPrefix).append(GetTextureName()).append(".bmp"), GL_TEXTURE_2D);
-    }
+    Engine::Texture* GetTexture() const;
 
-    static ChessPiece *CreatePiece(PieceType type, PlayerType player);
+    const PlayerType& GetPlayer() const { return m_player; }
 
-    const PlayerType &GetPlayer() const { return m_player; }
+    static std::unique_ptr<ChessPiece> CreatePiece(PieceType type, PlayerType player);
 
 protected:
     PlayerType m_player;
@@ -84,11 +82,7 @@ public:
         return false;
     }
 
-    Engine::Mesh *GetMesh() const override
-    {
-        static std::vector<Engine::Vertex> vertices = Engine::OBJClass().loadOBJ("Pawn.obj");
-        return new Engine::Mesh(vertices.data(), vertices.size(), nullptr, 0);
-    }
+    std::shared_ptr<Engine::Mesh> GetMesh() const override;
 
     std::string GetTextureName() const override { return "0"; }
 
@@ -112,11 +106,7 @@ public:
         return moveOffsets;
     }
 
-    Engine::Mesh *GetMesh() const override
-    {
-        static std::vector<Engine::Vertex> vertices = Engine::OBJClass().loadOBJ("Knight.obj");
-        return new Engine::Mesh(vertices.data(), vertices.size(), nullptr, 0);
-    }
+    std::shared_ptr<Engine::Mesh> GetMesh() const override;
 
     std::string GetTextureName() const override { return "2"; }
 };
@@ -145,11 +135,7 @@ public:
         return moveOffsets;
     }
 
-    Engine::Mesh *GetMesh() const override
-    {
-        static std::vector<Engine::Vertex> vertices = Engine::OBJClass().loadOBJ("Bishop.obj");
-        return new Engine::Mesh(vertices.data(), vertices.size(), nullptr, 0);
-    }
+    std::shared_ptr<Engine::Mesh> GetMesh() const override;
 
     std::string GetTextureName() const override { return "3"; }
 };
@@ -178,11 +164,7 @@ public:
         return moveOffsets;
     }
 
-    Engine::Mesh *GetMesh() const override
-    {
-        static std::vector<Engine::Vertex> vertices = Engine::OBJClass().loadOBJ("Rook.obj");
-        return new Engine::Mesh(vertices.data(), vertices.size(), nullptr, 0);
-    }
+    std::shared_ptr<Engine::Mesh> GetMesh() const override;
 
     std::string GetTextureName() const override { return "1"; }
 };
@@ -219,11 +201,7 @@ public:
         return moveOffsets;
     }
 
-    Engine::Mesh *GetMesh() const override
-    {
-        static std::vector<Engine::Vertex> vertices = Engine::OBJClass().loadOBJ("Queen.obj");
-        return new Engine::Mesh(vertices.data(), vertices.size(), nullptr, 0);
-    }
+    std::shared_ptr<Engine::Mesh> GetMesh() const override;
 
     std::string GetTextureName() const override { return "4"; }
 };
@@ -241,11 +219,7 @@ public:
         return moveOffsets;
     }
 
-    Engine::Mesh *GetMesh() const override
-    {
-        static std::vector<Engine::Vertex> vertices = Engine::OBJClass().loadOBJ("King.obj");
-        return new Engine::Mesh(vertices.data(), vertices.size(), nullptr, 0);
-    }
+    std::shared_ptr<Engine::Mesh> GetMesh() const override;
 
     std::string GetTextureName() const override { return "5"; }
 };

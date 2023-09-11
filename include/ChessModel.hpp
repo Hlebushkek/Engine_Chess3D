@@ -9,6 +9,8 @@ class ChessModel
 public:
     ChessModel();
     ~ChessModel() = default;
+    
+    void Reset();
 
     std::vector<std::pair<glm::ivec2, MoveType>> GetSelectionFor(ChessPiece *piece);
 
@@ -23,6 +25,6 @@ public:
 
     glm::vec2 GetPositionFor(ChessPiece *piece);
 private:
-    std::array<std::array<ChessPiece*, 8>, 8> boardState;
+    std::array<std::array<std::unique_ptr<ChessPiece>, 8>, 8> boardState;
 
 };

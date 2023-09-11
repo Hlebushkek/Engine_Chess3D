@@ -2,10 +2,7 @@
 #include "Chess3D.hpp"
 
 GUILobbiesListWindow::GUILobbiesListWindow()
-    : GUIWindow("Lobby Selection", false)
-{
-    (static_cast<Chess3D*>(Chess3D::Get()))->GetNetMessageDispatcher().AddListener(this);
-}
+    : GUIWindow("Lobby Selection", false) {}
 
 void GUILobbiesListWindow::InnerRender()
 {

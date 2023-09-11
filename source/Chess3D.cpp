@@ -22,7 +22,7 @@ Chess3D::Chess3D(const char* title, const int width, const int height)
     board = Engine::GameObject::Instantiate<ChessBoard>();
     boardLayer->AddRenderableObject(board);
     
-    std::shared_ptr<TestGameObject> testObject = Engine::GameObject::Instantiate<TestGameObject>(glm::vec3(0.f), Engine::Texture::LoadTexture("Grass.png", GL_TEXTURE_2D));
+    std::shared_ptr<TestGameObject> testObject = Engine::GameObject::Instantiate<TestGameObject>(glm::vec3(0.f), Engine::Texture::LoadTexture("Grass.png"));
     boardLayer->AddRenderableObject(testObject);
 
     std::shared_ptr<TestSphere> testSphere = Engine::GameObject::Instantiate<TestSphere>(glm::vec3(0.4f, 0.f, 0.f));
@@ -49,7 +49,7 @@ void Chess3D::Update()
 
 void Chess3D::UpdateNetwork()
 {
-    if (client->isConnected())
+    if (client && client->isConnected())
     {
         if (!client->incoming().empty())
         {
@@ -87,7 +87,9 @@ void Chess3D::UpdateNetwork()
             case ChessMessage::GameStarted:
             {
                 std::cout << "Game started\n";
-                SetupSession(std::make_shared<ChessSessionOnline>(client, board, activeLobby, activeUser));
+                auto session = std::make_shared<ChessSessionOnline>(client, board, activeLobby, activeUser);
+                netMsgDispatcher.AddListener(session);
+                SetupSession(session);
                 break;
             }
             default: break;

@@ -7,7 +7,7 @@ class ChessBoard;
 class ChessSessionOffline : public ChessSession
 {
 public:
-    ChessSessionOffline(std::shared_ptr<ChessBoard> board) : ChessSession(board) {}
+    ChessSessionOffline(std::weak_ptr<ChessBoard> board) : ChessSession(board) {}
 
     void Leave() override;
     void Surrender() override;

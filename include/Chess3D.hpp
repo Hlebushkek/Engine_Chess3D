@@ -15,7 +15,7 @@ public:
 
 	void Update() override;
 
-	std::shared_ptr<ChessClient> GetClient() { return client; }
+	ChessClient *GetClient() { return client.get(); }
 	ChessNetMessageDispatcher& GetNetMessageDispatcher() { return netMsgDispatcher; }
 
 private:
@@ -26,13 +26,13 @@ private:
 	void ApplicationWillTerminate() override;
 
 private:
-	std::shared_ptr<ChessBoard> board = nullptr;
-
 	User activeUser;
 	Lobby activeLobby;
 
+    std::shared_ptr<ChessBoard> board = nullptr;
 	std::shared_ptr<ChessClient> client = nullptr;
 	std::shared_ptr<ChessSession> activeSession = nullptr;
+
 	ChessNetMessageDispatcher netMsgDispatcher;
 
 };

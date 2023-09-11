@@ -8,7 +8,7 @@ ChessBoardPieceObject::ChessBoardPieceObject(Engine::Texture* baseTexture, glm::
     this->collider = new Engine::BoxCollider();
 
     Engine::Primitive cube = Engine::Cube();
-    this->meshes.emplace_back(new Engine::Mesh(cube));
+    this->meshes.emplace_back(std::make_shared<Engine::Mesh>(cube));
 
     Reset();
 }

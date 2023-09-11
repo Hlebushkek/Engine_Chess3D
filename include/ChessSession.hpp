@@ -5,9 +5,17 @@
 class ChessSession : public ChessBoardDelegate, public std::enable_shared_from_this<ChessSession>
 {
 public:
-    ChessSession(std::shared_ptr<ChessBoard> board) : m_currentTurn(PlayerType::White), m_board(board) {}
+    ChessSession(std::weak_ptr<ChessBoard> board) : m_currentTurn(PlayerType::White), m_board(board) {}
 
-    virtual void Start() { m_board->delegate = weak_from_this(); m_board->Reset(); }
+    virtual void Start()
+    {
+        if (auto board = m_board.lock())
+        {
+            board->delegate = weak_from_this();
+            board->Reset();
+        }
+    }
+
     virtual void NextTurn() { m_currentTurn = (m_currentTurn == PlayerType::White) ? PlayerType::Black : PlayerType::White; }
 
     virtual void Leave() = 0;
@@ -15,7 +23,7 @@ public:
 
 protected:
     PlayerType m_currentTurn;
-    std::shared_ptr<ChessBoard> m_board;
+    std::weak_ptr<ChessBoard> m_board;
 
     //Timer timer;
 

@@ -38,13 +38,11 @@ void OpenURLMac(const char* url)
 }
 #endif
 
-std::shared_ptr<ChessClient> client() { return (static_cast<Chess3D*>(Chess3D::Get()))->GetClient(); }
+ChessClient *client() { return (static_cast<Chess3D*>(Chess3D::Get()))->GetClient(); }
 
 InterfaceLayer::InterfaceLayer()
     : Engine::Layer("InterfaceLayer"), buttonGit("##gitButton", ImVec2(90, 90), "github_icon.png")
 {
-    (static_cast<Chess3D*>(Chess3D::Get()))->GetNetMessageDispatcher().AddListener(this);
-
     buttonGit.SetCustomPosition(ImVec2(9, 10));
     buttonGit.SetOnClick([]() {
         const char* url = "https://github.com/Hlebushkek/Engine_Chess3D";
@@ -70,8 +68,12 @@ void InterfaceLayer::OnAttach()
     authorizationWindow->delegate = weak_from_this();
     lobbiesListWindow->delegate = weak_from_this();
     lobbyWindow->delegate = weak_from_this();
+    
+    (static_cast<Chess3D*>(Chess3D::Get()))->GetNetMessageDispatcher().AddListener(weak_from_this());
+    (static_cast<Chess3D*>(Chess3D::Get()))->GetNetMessageDispatcher().AddListener(lobbiesListWindow);
 
-    ImGui::SetCurrentContext(Engine::ImGuiLayer::GetImguiContext());
+    auto ctx = Engine::Renderer::GetRenderingContext();
+    ImGui::SetCurrentContext(ctx->imguiContext);
 
     ImGuiStyle& style = ImGui::GetStyle();
     style.Colors[ImGuiCol_Button] = ImVec4(0.7f, 0.7f, 0.7f, 0.1f);  
@@ -89,7 +91,7 @@ void InterfaceLayer::OnAttach()
 
 void InterfaceLayer::OnImGuiRender()
 {
-    ImGui::SetCurrentContext(Engine::ImGuiLayer::GetImguiContext());
+    ImGui::SetCurrentContext(Engine::Renderer::GetRenderingContext()->imguiContext);
 
     for (auto window : windows)
         window->Render();

@@ -17,6 +17,7 @@ configure_file(${CMAKE_SOURCE_DIR}/config.h.in ${CMAKE_SOURCE_DIR}/include/confi
 if(APPLE)
     enable_language(OBJC)
     find_library(APPLICATIONSERVICES_FRAMEWORK ApplicationServices)
+    add_compile_definitions(ENABLE_METAL)
 endif()
 
 set(Boost_USE_STATIC_LIBS OFF) 

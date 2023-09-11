@@ -1,7 +1,8 @@
 #pragma once
 
 #include <vector>
-#include "Engine.hpp"
+
+namespace Engine { class Texture; }
 
 enum BlockMesh_Enum { CUBE = 0 };
 

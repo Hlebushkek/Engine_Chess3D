@@ -2,6 +2,11 @@
 
 ChessModel::ChessModel()
 {
+    this->Reset();
+}
+
+void ChessModel::Reset()
+{
     for (int i = 0; i < 8; i++)
     {
         boardState[1][i] = ChessPiece::CreatePiece(PieceType::Pawn, PlayerType::White);
@@ -88,12 +93,12 @@ void ChessModel::MovePiece(glm::ivec2 from, glm::ivec2 to)
 void ChessModel::MovePiece(int fromX, int fromY, int toX, int toY)
 {
     if (boardState[toY][toX])
-        delete boardState[toY][toX];
+        boardState[toY][toX] = nullptr;
 
-    boardState[toY][toX] = boardState[fromY][fromX];
+    boardState[toY][toX] = std::move(boardState[fromY][fromX]);
     boardState[fromY][fromX] = nullptr;
 
-    if (auto pawn = static_cast<Pawn*>(boardState[toY][toX]))
+    if (auto pawn = static_cast<Pawn*>(boardState[toY][toX].get()))
         pawn->SetHasMoved();
 }
 
@@ -106,7 +111,7 @@ ChessPiece *ChessModel::GetPieceAt(int x, int y)
     if (!PositionExists(x, y))
         return nullptr;
 
-    return boardState[y][x];
+    return boardState[y][x].get();
 }
 
 bool ChessModel::PositionExists(glm::ivec2 position)
@@ -123,7 +128,7 @@ glm::vec2 ChessModel::GetPositionFor(ChessPiece *piece)
 {
     for (int y = 0; y < 8; y++)
         for (int x = 0; x < 8; x++)
-            if (boardState[y][x] == piece)
+            if (boardState[y][x].get() == piece)
                 return glm::vec2(x, y);
 
     return glm::vec2(INT_MAX);

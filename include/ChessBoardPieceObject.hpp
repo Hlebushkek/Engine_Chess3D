@@ -16,8 +16,8 @@ public:
 private:
     bool isHighlighted;
 
-    Engine::Texture *baseTexture;
-    Engine::Texture *moveTexture;
-    Engine::Texture *attackTexture;
+    Engine::Texture* baseTexture;
+    Engine::Texture* moveTexture;
+    Engine::Texture* attackTexture;
 
 };

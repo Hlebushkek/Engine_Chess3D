@@ -10,17 +10,21 @@ public:
 
 class ChessNetMessageDispatcher {
 public:
-    void AddListener(ChessNetMessageListener* listener)
+    void AddListener(std::weak_ptr<ChessNetMessageListener> listener)
     {
         listeners.push_back(listener);
     }
 
     void DispatchMessage(const net::Message<ChessMessage>& msg)
     {
-        for (ChessNetMessageListener* listener : listeners)
-            listener->HandleNetMessage(msg);
+        listeners.erase(std::remove_if(listeners.begin(), listeners.end(),
+            [](const std::weak_ptr<ChessNetMessageListener>& wp) { return wp.expired(); }), listeners.end());
+
+        for (auto weakListener : listeners)
+            if (auto listener = weakListener.lock())
+                listener->HandleNetMessage(msg);
     }
 
 private:
-    std::vector<ChessNetMessageListener*> listeners;
+    std::vector<std::weak_ptr<ChessNetMessageListener>> listeners;
 };

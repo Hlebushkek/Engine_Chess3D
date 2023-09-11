@@ -15,6 +15,8 @@ void ChessSessionOffline::DidRequestMovePiece(glm::ivec2 from, glm::ivec2 to, Pl
     if (type != m_currentTurn)
         return;
 
-    m_board->MovePiece(from, to);
+    if (auto board = m_board.lock())
+        board->MovePiece(from, to);
+
     NextTurn();
 }

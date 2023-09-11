@@ -7,11 +7,11 @@
 
 ChessBoard::ChessBoard() : GameObject()
 {
-    textureWhite = Engine::Texture::LoadTexture("BlockB.png", GL_TEXTURE_2D);
-    textureBlack = Engine::Texture::LoadTexture("Grass.png", GL_TEXTURE_2D);
+    textureWhite = Engine::Texture::LoadTexture("BlockB.png");
+    textureBlack = Engine::Texture::LoadTexture("Grass.png");
 }
 
-void ChessBoard::UpdateSelection(ChessPieceObject *piece)
+void ChessBoard::UpdateSelection(ChessPieceObject* piece)
 {
     ResetSelection();
 
@@ -37,7 +37,7 @@ void ChessBoard::ResetSelection()
     selectedPiece = nullptr;
 }
 
-void ChessBoard::MovePiece(const glm::ivec2 &from, const glm::vec2 &to)
+void ChessBoard::MovePiece(const glm::ivec2& from, const glm::vec2& to)
 {
     auto piece = GetPieceAt(from);
     if (piece == nullptr)
@@ -52,7 +52,7 @@ void ChessBoard::MovePiece(const glm::ivec2 &from, const glm::vec2 &to)
     ResetSelection();
 }
 
-void ChessBoard::RequestMovePiece(ChessBoardPieceObject *piece)
+void ChessBoard::RequestMovePiece(ChessBoardPieceObject* piece)
 {
     if (selectedPiece == nullptr)
         return;
@@ -65,7 +65,7 @@ void ChessBoard::RequestMovePiece(ChessBoardPieceObject *piece)
             delegate.lock()->DidRequestMovePiece(from, to, selectedPiece->GetModel()->GetPlayer());
 }
 
-void ChessBoard::RemovePiece(ChessPiece *piece)
+void ChessBoard::RemovePiece(ChessPiece* piece)
 {
     for (auto it = pieces.begin(); it != pieces.end(); it++)
     {
@@ -84,7 +84,7 @@ void ChessBoard::Reset()
         obj->transform()->UnassignParent();
     pieces.clear();
 
-    model = ChessModel();
+    model.Reset();
     for (int y = 0; y < 8; y++)
         for (int x = 0; x < 8; x++)
             if (ChessPiece *piece = model.GetPieceAt(x, y))
@@ -102,14 +102,14 @@ void ChessBoard::Initialize(std::shared_ptr<GameObject> object)
     for (int y = 0; y < 8; y++)
         for (int x = 0; x < 8; x++)
         {
-            Engine::Texture *pieceTexture = ((x % 8 + y) % 2) == 0 ? textureWhite : textureBlack;
+            Engine::Texture* pieceTexture = ((x % 8 + y) % 2) == 0 ? textureWhite : textureBlack;
             auto piece = Engine::GameObject::Instantiate<ChessBoardPieceObject>(pieceTexture, glm::vec3(0.5 + x * 0.0625, 0, y * -0.0625), glm::vec3(0.f), glm::vec3(0.0625f));
             piece->transform()->SetParent(m_transform);
             boardBlocks[y][x] = piece;
         }
 }
 
-std::shared_ptr<ChessPieceObject> ChessBoard::GetPieceAt(const glm::ivec2 &position)
+std::shared_ptr<ChessPieceObject> ChessBoard::GetPieceAt(const glm::ivec2& position)
 {
     auto pieceModel = model.GetPieceAt(position);
 
@@ -123,7 +123,7 @@ std::shared_ptr<ChessPieceObject> ChessBoard::GetPieceAt(const glm::ivec2 &posit
     return nullptr;
 }
 
-glm::ivec2 ChessBoard::GetPositionFor(ChessBoardPieceObject *piece)
+glm::ivec2 ChessBoard::GetPositionFor(ChessBoardPieceObject* piece)
 {
     for (int y = 0; y < 8; y++)
         for (int x = 0; x < 8; x++)
@@ -133,7 +133,7 @@ glm::ivec2 ChessBoard::GetPositionFor(ChessBoardPieceObject *piece)
     return glm::vec2(INT_MAX);
 }
 
-std::optional<Engine::Intersection> ChessBoard::CollidesWith(const Ray &ray)
+std::optional<Engine::Intersection> ChessBoard::CollidesWith(const Ray& ray)
 {
     std::optional<Engine::Intersection> result = std::nullopt;
 
